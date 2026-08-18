@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>타이어공장도가격 — 테스트</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* 테스트판에만 있는 것 */
+  .testbar{background:#111a24; color:#e8eef6; font-size:12.5px; font-weight:700; text-align:center; padding:6px 12px; letter-spacing:-.01em}
+  .testbar b{color:#7fb0ff}
+  .startbox{background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:36px 24px; text-align:center}
+  .startbox h3{margin:0 0 6px; font-size:19px; font-weight:800; letter-spacing:-.03em}
+  .startbox p{margin:0 0 18px; font-size:13.5px; color:var(--ink-3)}
+  .startbox .row{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+
+  /* 제조사 박스 안의 삭제 버튼 */
+  .bc-del{position:absolute; top:8px; right:8px; width:24px; height:24px; border:1px solid var(--line); border-radius:7px;
+    background:var(--panel); color:var(--ink-3); font-size:12px; line-height:1; cursor:pointer; opacity:.5; transition:.14s}
+  .bcard{position:relative}
+  .bcard .bc-h{padding-right:30px}   /* 삭제 버튼 자리 비워두기 */
+  .bcard:hover .bc-del{opacity:1}
+
+  /* 순서 번호 입력칸 */
+  .bc-no{flex:none; width:34px; height:26px; text-align:center; padding:0;
+    border:1px solid var(--line); border-radius:7px; background:var(--panel-2);
+    font-size:13.5px; font-weight:800; color:var(--ink-2); font-variant-numeric:tabular-nums;
+    -moz-appearance:textfield; transition:.14s}
+  .bc-no::-webkit-outer-spin-button,
+  .bc-no::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+  .bc-no:hover{border-color:var(--brand)}
+  .bc-no:focus{border-color:var(--brand); background:var(--brand-soft); color:var(--brand);
+    outline:none; box-shadow:0 0 0 3px var(--brand-soft)}
+  .bc-del:hover{background:var(--price-soft); border-color:var(--price); color:var(--price); opacity:1}
+
+  /* 맨 끝의 빈 박스 = 제조사 추가 */
+  .bcard.bnew{border-style:dashed; background:var(--panel-2); display:flex; align-items:center; justify-content:center;
+    min-height:150px; cursor:pointer; color:var(--ink-3); font-weight:800; font-size:14px; gap:6px}
+  .bcard.bnew:hover{border-color:var(--brand); color:var(--brand); background:var(--brand-soft)}
+  .bcard.bnew span{font-size:20px; font-weight:700; line-height:1}
+
+  /* 파일보관함 / 최근 올린 파일 2열 */
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start}
+  .card.keep{border-color:var(--ok)}
+  .card.keep .card-h{background:var(--ok-soft); border-bottom-color:var(--ok)}
+  .card.hist .card-h{background:var(--panel-2)}
+  .tag{font-size:11px; font-weight:800; letter-spacing:.04em; padding:3px 9px; border-radius:999px;
+    background:var(--line-2); color:var(--ink-3)}
+  .tag.ok{background:var(--ok); color:#fff}
+  .fname{font-weight:700}
+  .fnone{color:var(--ink-3); font-weight:600}
+  /* 2열 안에서는 표가 좁으므로 최소폭을 줄이고 글자도 조금 작게 */
+  .twocol table.mini{min-width:430px; font-size:12.5px}
+  .twocol table.mini th,
+  .twocol table.mini td{padding:8px 9px}
+  .twocol .card-h p{font-size:12px}
+  @media (max-width:1080px){ .twocol{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<div class="testbar" id="testbar">테스트용 화면입니다 · 자료는 <b>이 컴퓨터 안에만</b> 저장됩니다 · 관리자는 왼쪽 위 <b>파란 마크</b> 클릭 (비밀번호 1234)</div>
+
+<!-- ==================== 조회 ==================== -->
+<div id="view-app">
+  <header class="top">
+    <div class="top-in">
+      <span class="logo">
+        <button class="mk" id="mk-admin" aria-label="타이어공장도가격"></button>
+        <span class="txt">타이어<b>공장도가격</b></span>
+      </span>
+      <div class="gsearch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input class="inp" id="q" type="search" placeholder="제품명 또는 규격 검색 (예: 벤투스, 225/45R18)" autocomplete="off">
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="rail">
+      <div class="fset">
+        <h4>제조사</h4>
+        <div id="brandlist"></div>
+      </div>
+      <div class="fset" id="season-set" hidden>
+        <h4>계절</h4>
+        <div id="seasonlist"></div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="fchips" id="chips" hidden></div>
+
+      <div class="startbox" id="startbox" hidden>
+        <h3>아직 올린 가격표가 없습니다</h3>
+        <p>관리자에서 엑셀을 올리거나, 먼저 예시 자료로 화면을 둘러보세요.</p>
+        <div class="row">
+          <button class="btn btn-pri" id="btn-sample">예시 자료 넣고 둘러보기</button>
+          <button class="btn btn-out" id="btn-goadmin">관리자로 가서 엑셀 올리기</button>
+        </div>
+      </div>
+
+      <div class="tblwrap" id="tblwrap">
+        <div class="tscroll">
+          <table class="grid">
+            <thead>
+              <tr>
+                <th style="width:92px">제조사</th>
+                <th>모델</th>
+                <th style="width:150px">제품명</th>
+                <th style="width:190px">규격</th>
+                <th class="t-c" style="width:80px">계절</th>
+                <th class="t-r" style="width:130px">공장도가</th>
+                <th class="t-c" style="width:96px">DC율</th>
+                <th class="t-r" style="width:140px">할인가</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="mobcards" id="mrows"></div>
+        <div class="pager" id="pager"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 관리자 ==================== -->
+<div id="view-admin" hidden>
+  <header class="top">
+    <div class="top-in">
+      <span class="logo"><span class="mk"></span><span class="txt">타이어<b>공장도가격</b> <span style="font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.08em">ADMIN</span></span></span>
+      <span style="flex:1"></span>
+      <div class="top-right">
+        <button class="btn btn-out btn-sm" id="btn-logout">나가기</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="adm">
+    <div class="admhead">
+      <h2>제조사별 가격표 올리기</h2>
+    </div>
+
+    <div class="bgrid" id="bgrid"></div>
+
+    <div class="twocol">
+      <!-- 왼쪽 : 지금 적용 중인 파일 -->
+      <div class="card keep">
+        <div class="card-h">
+          <div><h3>파일보관함</h3><p>제조사마다 <b>지금 사이트에 적용 중인</b> 파일입니다.</p></div>
+          <span class="sp"></span><span class="tag ok">현재</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="mini">
+            <thead><tr><th style="width:74px">제조사</th><th>파일명</th><th style="width:104px">적용 날짜</th><th class="t-r" style="width:56px">건수</th><th class="t-c" style="width:62px">받기</th></tr></thead>
+            <tbody id="frows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 오른쪽 : 지금까지 올린 기록 -->
+      <div class="card hist">
+        <div class="card-h">
+          <div><h3>최근 올린 파일</h3><p>최근 <b>30개</b>까지 남습니다. 되돌리면 이전 가격표로 돌아갑니다.</p></div>
+          <span class="sp"></span><span class="tag">기록</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="mini">
+            <thead><tr><th style="width:104px">올린 날짜</th><th style="width:74px">제조사</th><th>파일명</th><th class="t-c" style="width:142px">관리</th></tr></thead>
+            <tbody id="hrows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 비밀번호 -->
+<div class="veil" id="lockveil" hidden>
+  <div class="lock">
+    <h3>관리자 비밀번호</h3>
+    <p>가격표를 올리려면 비밀번호를 입력하세요.</p>
+    <input class="inp num" id="lockpw" type="password" inputmode="numeric" maxlength="30" placeholder="••••">
+    <p class="err" id="lockerr" hidden></p>
+    <div class="row">
+      <button class="btn btn-out" id="lockno">취소</button>
+      <button class="btn btn-pri" id="lockok">들어가기</button>
+    </div>
+    <p style="margin:14px 0 0; font-size:11.5px; color:var(--ink-3)">테스트용 비밀번호 : 1234</p>
+  </div>
+</div>
+
+<!-- 결과 알림 -->
+<div class="veil" id="resveil" hidden>
+  <div class="lock" style="max-width:440px">
+    <h3 id="resttl">업로드 완료</h3>
+    <div id="resbody" style="font-size:13.5px; color:var(--ink-2); line-height:1.7; max-height:50vh; overflow:auto"></div>
+    <div class="row"><button class="btn btn-pri" id="resok">확인</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

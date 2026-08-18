@@ -1,0 +1,13 @@
+# 서버에서 자동으로 만들어지는 것들 — 올리지 않는다
+웹/data/tmp/
+웹/data/files/
+웹/data/cache/
+웹/assets/price.json
+
+# 임시 · 시스템 파일
+*.sqlite
+*.log
+*.tmp
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,9 @@
+# 업로드 원본·임시파일·캐시가 들어있는 폴더입니다.
+# 주소로 직접 열 수 없게 막습니다.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

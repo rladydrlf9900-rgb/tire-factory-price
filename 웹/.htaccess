@@ -1,0 +1,55 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# ── 검색엔진용 주소 만들기 ─────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 실제 파일·폴더는 그대로 둔다
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # /225-45-18  →  규격 페이지
+  RewriteRule ^([0-9]{3}-[0-9]{2}-[0-9]{2})/?$ view.php?type=size&key=$1 [L,QSA]
+
+  # /브랜드/한국  →  제조사 페이지
+  RewriteRule ^(브랜드|brand)/([^/]+)/?$ view.php?type=brand&key=$2 [L,QSA,B]
+
+  # /sitemap.xml
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+</IfModule>
+
+# ── 설정·라이브러리는 브라우저로 못 열게 ────────────────
+<FilesMatch "^(설정\.php|.*\.(sql|md|log))$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ── 압축 (가격표 파일이 60KB 정도로 줄어든다) ───────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+</IfModule>
+
+# ── 캐시 ────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css          "access plus 30 days"
+  ExpiresByType application/javascript "access plus 30 days"
+  ExpiresByType application/json  "access plus 1 hours"
+  ExpiresByType image/svg+xml     "access plus 30 days"
+</IfModule>
+
+# ── 업로드 용량 (호스팅이 허용하는 경우에만 적용) ────────
+<IfModule mod_php.c>
+  php_value upload_max_filesize 20M
+  php_value post_max_size 24M
+  php_value max_execution_time 180
+  php_value memory_limit 256M
+</IfModule>
