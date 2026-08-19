@@ -18,10 +18,12 @@ if ($type === 'size') {
     if (!$sz) not_found();
     [$size, $w, $a, $inch] = $sz;
 
+    /* 제조사 차례대로 — 손님 화면(assets/app.js)의 정렬과 같아야 화면이 다시 바뀌지 않는다 */
     $st = db()->prepare(
-        'SELECT brand, model, product, size, spec, season, price
-           FROM tires WHERE visible = 1 AND width = ? AND aspect = ? AND inch = ?
-          ORDER BY price ASC, id ASC LIMIT 200'
+        'SELECT t.brand, t.model, t.product, t.size, t.spec, t.season, t.price
+           FROM tires t LEFT JOIN brands b ON b.name = t.brand
+          WHERE t.visible = 1 AND t.width = ? AND t.aspect = ? AND t.inch = ?
+          ORDER BY COALESCE(b.sort_no, 9999) ASC, t.price ASC, t.id ASC LIMIT 200'
     );
     $st->execute([$w, $a, $inch]);
     $rows = $st->fetchAll();
@@ -57,7 +59,7 @@ if ($type === 'brand') {
 
     $st = db()->prepare(
         'SELECT brand, model, product, size, spec, season, price
-           FROM tires WHERE visible = 1 AND brand = ? ORDER BY price ASC, id ASC LIMIT 30'
+           FROM tires WHERE visible = 1 AND brand = ? ORDER BY price ASC, id ASC LIMIT ' . (int)PER_PAGE
     );
     $st->execute([$brand]);
     $rows = $st->fetchAll();

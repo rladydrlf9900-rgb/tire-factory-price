@@ -38,12 +38,15 @@ DirectoryIndex index.php
 </IfModule>
 
 # ── 캐시 ────────────────────────────────────────────────
+# 주소마다 ?v=파일수정시각 이 붙어 있어서, 파일이 바뀌면 주소가 달라져
+# 손님 브라우저가 즉시 새로 받는다. 그래서 기한을 길게 잡아도 안전하다.
+# (가격표는 6개월~1년에 한 번 바뀌므로 그동안은 한 번만 받으면 된다)
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresByType text/css          "access plus 30 days"
-  ExpiresByType application/javascript "access plus 30 days"
-  ExpiresByType application/json  "access plus 1 hours"
-  ExpiresByType image/svg+xml     "access plus 30 days"
+  ExpiresByType text/css          "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType application/json  "access plus 1 year"
+  ExpiresByType image/svg+xml     "access plus 1 year"
 </IfModule>
 
 # ── 업로드 용량 (호스팅이 허용하는 경우에만 적용) ────────

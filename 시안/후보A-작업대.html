@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후보 A — 작업대 | 타이어공장도가격 시안</title>
+<style>
+  :root{
+    --바탕:#eef1f6; --판:#fff; --선:#dfe4ec; --글:#151a22; --흐림:#697386;
+    --파랑:#1f5eff; --파랑연:#e8efff; --주황:#e8590c; --초록:#0b8457;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--바탕);color:var(--글);
+       font:15px/1.5 -apple-system,'Segoe UI','맑은 고딕','Malgun Gothic',sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .시안표시{position:fixed;left:14px;bottom:14px;z-index:9;background:#151a22;color:#fff;
+       padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:700;opacity:.9}
+
+  /* 머리 */
+  header{background:var(--판);border-bottom:1px solid var(--선);position:sticky;top:0;z-index:5}
+  .머리{max-width:1360px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;gap:22px}
+  .로고{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;letter-spacing:-.4px;white-space:nowrap}
+  .마크{width:26px;height:26px;border-radius:8px;background:var(--파랑);position:relative}
+  .마크:after{content:'';position:absolute;inset:8px;border-radius:50%;background:#fff}
+  .검색{flex:1;max-width:640px;position:relative}
+  .검색 input{width:100%;height:46px;border:1.5px solid var(--선);border-radius:12px;
+       padding:0 16px 0 44px;font-size:15px;background:#f8fafc;outline:none}
+  .검색 input:focus{border-color:var(--파랑);background:#fff;box-shadow:0 0 0 4px var(--파랑연)}
+  .검색 svg{position:absolute;left:15px;top:14px;width:18px;height:18px;color:var(--흐림)}
+  .광고{margin-left:auto;width:200px;height:44px;border:1px dashed #cfd6e2;border-radius:9px;
+       display:flex;align-items:center;justify-content:center;color:#aab3c2;font-size:12px}
+
+  /* 자주 찾는 규격 */
+  .빠른줄{background:var(--판);border-bottom:1px solid var(--선)}
+  .빠른{max-width:1360px;margin:0 auto;padding:0 22px 12px;display:flex;align-items:center;gap:8px;
+       overflow-x:auto;scrollbar-width:none}
+  .빠른::-webkit-scrollbar{display:none}
+  .빠른 b{font-size:12.5px;color:var(--흐림);font-weight:700;white-space:nowrap;margin-right:2px}
+  .칩{border:1px solid var(--선);background:#fff;border-radius:999px;padding:6px 13px;font-size:13px;
+      font-weight:600;cursor:pointer;white-space:nowrap;color:#39424f}
+  .칩:hover{border-color:var(--파랑);color:var(--파랑)}
+  .칩.켬{background:var(--파랑);border-color:var(--파랑);color:#fff}
+
+  /* 몸통 */
+  .몸{max-width:1360px;margin:0 auto;padding:20px 22px 60px;display:grid;grid-template-columns:212px 1fr;gap:20px}
+  .옆{position:sticky;top:88px;align-self:start;display:grid;gap:12px}
+  .상자{background:var(--판);border:1px solid var(--선);border-radius:14px;padding:15px 16px}
+  .상자 h4{margin:0 0 11px;font-size:12.5px;color:var(--흐림);letter-spacing:.4px}
+  .체크{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:14px;cursor:pointer;font-weight:500}
+  .체크 input{width:16px;height:16px;accent-color:var(--파랑);cursor:pointer}
+  .체크 span.수{margin-left:auto;font-size:11.5px;color:#a8b0bd;font-variant-numeric:tabular-nums}
+
+  /* 표 */
+  .판{background:var(--판);border:1px solid var(--선);border-radius:14px;overflow:hidden}
+  .판머리{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--선)}
+  .판머리 strong{font-size:15px}
+  .판머리 em{font-style:normal;color:var(--흐림);font-size:13px}
+  .판머리 .갱신{margin-left:auto;font-size:12.5px;color:var(--초록);font-weight:700;
+       background:#e7f7f0;padding:5px 11px;border-radius:999px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:12px;color:var(--흐림);font-weight:700;text-align:left;padding:11px 14px;
+     background:#f7f9fc;border-bottom:1px solid var(--선);white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid #f0f2f6;font-size:14px;vertical-align:middle}
+  tbody tr:hover{background:#f9fbff}
+  tbody tr.할인중{background:#fffaf5}
+  .점{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .제조사{font-weight:700}
+  .규격{font-variant-numeric:tabular-nums;font-weight:600}
+  .규격 i{font-style:normal;color:var(--흐림);font-size:12.5px;margin-left:5px}
+  .계절{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:6px;background:#eef1f6;color:#5a6474}
+  .계절.여름{background:#e6f4ff;color:#0b74c4}
+  .계절.겨울{background:#eef0ff;color:#4c56c0}
+  .계절.SUV{background:#f3ecff;color:#7040c9}
+  .원가{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+  .원가 u{text-decoration:none;color:var(--흐림);font-size:11.5px;font-weight:600;margin-left:2px}
+  .dc{text-align:center}
+  .dc input{width:62px;height:32px;border:1px solid var(--선);border-radius:8px;text-align:right;
+       padding:0 20px 0 6px;font-size:14px;font-variant-numeric:tabular-nums;outline:none}
+  .dc input:focus{border-color:var(--주황);box-shadow:0 0 0 3px #fdf0e6}
+  .dc span{margin-left:-17px;font-size:12px;color:var(--흐림)}
+  .할인{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:15px;color:var(--주황);white-space:nowrap}
+  .할인 u{text-decoration:none;font-size:11.5px;color:#c78a5f;font-weight:600;margin-left:2px}
+  .배지{display:inline-block;margin-left:7px;font-size:10.5px;font-weight:800;color:#fff;
+       background:var(--초록);border-radius:5px;padding:2px 5px;vertical-align:2px}
+  .쪽{display:flex;justify-content:center;align-items:center;gap:6px;padding:16px}
+  .쪽 button{min-width:34px;height:34px;border:1px solid var(--선);background:#fff;border-radius:9px;
+       font-size:13.5px;font-weight:700;color:#424b58;cursor:pointer}
+  .쪽 button.켬{background:var(--파랑);border-color:var(--파랑);color:#fff}
+  @media (max-width:900px){ .몸{grid-template-columns:1fr} .옆{position:static} .광고{display:none} }
+</style>
+</head>
+<body>
+<div class="시안표시">후보 A — 작업대</div>
+
+<header>
+  <div class="머리">
+    <div class="로고"><span class="마크"></span>타이어<b>공장도가격</b></div>
+    <div class="검색">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="검색칸" type="search" placeholder="제품명 또는 규격 검색 (예: 벤투스, 225/45R18, 2054516)">
+    </div>
+    <div class="광고">광고 자리</div>
+  </div>
+  <div class="빠른줄"><div class="빠른" id="빠른">
+    <b>자주 찾는 규격</b>
+  </div></div>
+</header>
+
+<div class="몸">
+  <aside class="옆">
+    <div class="상자"><h4>제조사</h4><div id="제조사칸"></div></div>
+    <div class="상자"><h4>계절</h4><div id="계절칸"></div></div>
+  </aside>
+
+  <main>
+    <div class="판">
+      <div class="판머리">
+        <strong id="세기">30개 품목</strong>
+        <em>1본 기준 · 부가세 별도</em>
+        <span class="갱신">오늘 갱신 · 넥센 · 한국</span>
+      </div>
+      <table>
+        <thead><tr>
+          <th style="width:96px">제조사</th><th>모델</th><th style="width:130px">제품명</th>
+          <th style="width:170px">규격</th><th style="width:78px">계절</th>
+          <th style="width:120px;text-align:right">공장도가</th>
+          <th style="width:96px;text-align:center">DC율</th>
+          <th style="width:150px;text-align:right">할인가</th>
+        </tr></thead>
+        <tbody id="줄들"></tbody>
+      </table>
+      <div class="쪽" id="쪽"></div>
+    </div>
+  </main>
+</div>
+
+<script src="후보-자료.js"></script>
+<script>
+const 색 = {한국:'#e03131',금호:'#1f5eff',넥센:'#0b8457',미쉐린:'#f59f00',콘티넨탈:'#495057',
+           브리지스톤:'#c92a2a',피렐리:'#f76707',던롭:'#c2255c',굿이어:'#1971c2',요코하마:'#0c8599'};
+const 제조사고름 = new Set(), 계절고름 = new Set();
+let 말 = '', 쪽번호 = 1;
+const 한쪽 = 12;
+
+document.getElementById('제조사칸').innerHTML = 제조사목록.map(b => {
+  const n = 자료.filter(r => r[0] === b).length;
+  return `<label class="체크"><input type="checkbox" value="${b}">${b}<span class="수">${n || ''}</span></label>`;
+}).join('');
+document.getElementById('계절칸').innerHTML = ['사계절','여름','SUV'].map(s =>
+  `<label class="체크"><input type="checkbox" value="${s}">${s}</label>`).join('');
+
+document.getElementById('빠른').insertAdjacentHTML('beforeend',
+  ['185/65R15','195/65R15','205/55R16','205/60R16','215/55R17','225/45R18','235/45R18','245/40R19']
+    .map(s => `<button class="칩" data-규격="${s}">${s}</button>`).join(''));
+
+function 그리기(){
+  const 결과 = 걸러내기(자료, 말, 제조사고름, 계절고름);
+  const 최저 = 결과.length ? Math.min(...결과.map(r => r[6])) : 0;
+  const 총쪽 = Math.max(1, Math.ceil(결과.length / 한쪽));
+  if (쪽번호 > 총쪽) 쪽번호 = 총쪽;
+  const 조각 = 결과.slice((쪽번호 - 1) * 한쪽, 쪽번호 * 한쪽);
+
+  document.getElementById('세기').textContent = 결과.length + '개 품목';
+  document.getElementById('줄들').innerHTML = 조각.map(r => `
+    <tr data-row data-price="${r[6]}">
+      <td class="제조사"><span class="점" style="background:${색[r[0]] || '#adb5bd'}"></span>${r[0]}</td>
+      <td>${r[1]}</td><td>${r[2]}</td>
+      <td class="규격">${r[3]}<i>${r[4]}</i></td>
+      <td><span class="계절 ${r[5]}">${r[5]}</span></td>
+      <td class="원가">${돈(r[6])}<u>원</u></td>
+      <td class="dc"><input data-dc type="number" min="0" max="95" placeholder=""><span>%</span></td>
+      <td class="할인"><span data-sale>${돈(r[6])}</span><u>원</u>${r[6] === 최저 ? '<span class="배지">최저</span>' : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="8" style="padding:50px;text-align:center;color:#98a1b0">찾는 조건에 맞는 상품이 없습니다.</td></tr>';
+
+  document.getElementById('쪽').innerHTML = Array.from({length: 총쪽}, (_, i) =>
+    `<button class="${i + 1 === 쪽번호 ? '켬' : ''}" data-쪽="${i + 1}">${i + 1}</button>`).join('');
+}
+
+document.getElementById('검색칸').addEventListener('input', e => { 말 = e.target.value; 쪽번호 = 1; 그리기(); });
+document.querySelector('.몸').addEventListener('change', e => {
+  const c = e.target.closest('input[type=checkbox]'); if (!c) return;
+  const 통 = c.closest('#제조사칸') ? 제조사고름 : 계절고름;
+  c.checked ? 통.add(c.value) : 통.delete(c.value);
+  쪽번호 = 1; 그리기();
+});
+document.getElementById('빠른').addEventListener('click', e => {
+  const b = e.target.closest('.칩'); if (!b) return;
+  const 켬 = b.classList.contains('켬');
+  document.querySelectorAll('.칩').forEach(x => x.classList.remove('켬'));
+  if (!켬) { b.classList.add('켬'); 말 = b.dataset.규격; } else 말 = '';
+  document.getElementById('검색칸').value = 말; 쪽번호 = 1; 그리기();
+});
+document.getElementById('쪽').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  쪽번호 = +b.dataset.쪽; 그리기(); window.scrollTo({top: 0, behavior: 'smooth'});
+});
+DC묶기(document.body);
+그리기();
+</script>
+</body>
+</html>

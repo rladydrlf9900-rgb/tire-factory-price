@@ -16,6 +16,8 @@ $urls = [['loc' => $host . '/', 'pri' => '1.0', 'freq' => 'daily']];
 $sizes = db()->query('SELECT size, COUNT(*) c FROM tires WHERE visible = 1 GROUP BY size ORDER BY c DESC')
              ->fetchAll();
 foreach ($sizes as $s) {
+    /* 화물·오프로드 규격은 규격 페이지 주소를 만들 수 없다 — 사이트맵에 넣지 않는다 */
+    if (!size_has_page($s['size'])) continue;
     $urls[] = [
         'loc'  => $host . '/' . size_to_slug($s['size']),
         'pri'  => $s['c'] >= 10 ? '0.9' : '0.6',

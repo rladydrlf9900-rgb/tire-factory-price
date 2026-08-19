@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후보 D — 규격 먼저 | 타이어공장도가격 시안</title>
+<style>
+  :root{
+    /* 바탕 · 글씨 */
+    --바탕:#f5f8f7; --판:#fff; --선:#e7ecea; --선진:#d7e0dc;
+    --글:#101815; --중간글:#4a5551; --흐림:#79857f;
+    /* 중심색 — 깊은 소나무초록 */
+    --초록:#0f5741; --초록진:#0a3c2c; --초록연:#e8f4ef; --초록선:#bfded1;
+    /* 강조색 — 할인가 */
+    --주황:#d9530a; --주황연:#fff6f0; --주황선:#f6cdae;
+    --금:#a4690a; --금연:#fdf5e3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--글);
+       background:
+         radial-gradient(900px 340px at 50% -140px, #e4f1eb 0%, rgba(228,241,235,0) 70%),
+         var(--바탕);
+       font:15px/1.55 -apple-system,'Segoe UI','맑은 고딕','Malgun Gothic',sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .시안표시{position:fixed;left:14px;bottom:14px;z-index:9;
+       background:linear-gradient(135deg,var(--초록) 0%,var(--초록진) 100%);color:#fff;
+       padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;
+       box-shadow:0 4px 14px rgba(10,60,44,.28)}
+  .줄{max-width:1180px;margin:0 auto;padding:0 22px}
+
+  /* ── 머리 ── */
+  header{background:rgba(255,255,255,.86);backdrop-filter:blur(8px);
+         border-bottom:1px solid var(--선);position:sticky;top:0;z-index:8}
+  .위{display:flex;align-items:center;gap:16px;padding:15px 0}
+  .로고{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;letter-spacing:-.5px}
+  .로고 b{color:var(--초록)}
+  .마크{width:27px;height:27px;border-radius:8px;position:relative;transform:rotate(45deg);
+       background:linear-gradient(135deg,#17795b 0%,var(--초록진) 100%);
+       box-shadow:0 3px 10px rgba(15,87,65,.3)}
+  .마크:after{content:'';position:absolute;inset:8px;border-radius:2px;background:#fff}
+  .위 .광고{margin-left:auto;width:190px;height:42px;border:1px dashed var(--선진);border-radius:9px;
+       display:flex;align-items:center;justify-content:center;color:#b3bdb8;font-size:12px}
+
+  /* ── 찾는 칸 ── */
+  .고르판{background:var(--판);border:1px solid var(--선);border-radius:18px;padding:18px 20px;
+       margin:24px 0 20px;box-shadow:0 10px 30px rgba(16,50,40,.05)}
+  .찾기{position:relative}
+  .찾기 input{width:100%;height:52px;border:1.5px solid var(--선진);border-radius:13px;
+       padding:0 16px 0 46px;font-size:15.5px;outline:none;background:#fcfefd;
+       transition:border-color .15s,box-shadow .15s,background .15s}
+  .찾기 input::placeholder{color:#9aa5a0}
+  .찾기 input:focus{border-color:var(--초록);background:#fff;box-shadow:0 0 0 4px var(--초록연)}
+  .찾기 svg{position:absolute;left:16px;top:17px;width:19px;height:19px;color:var(--흐림);pointer-events:none}
+  .찾기 input:focus + svg{color:var(--초록)}
+
+  .한칸{display:flex;align-items:center;gap:12px;padding:14px 0 2px;margin-top:12px;
+        border-top:1px dashed #e9efec}
+  .한칸 > b{width:52px;font-size:12.5px;color:var(--흐림);font-weight:700;flex:none;letter-spacing:.2px}
+  .알들{display:flex;flex-wrap:wrap;gap:7px}
+  .알{border:1px solid var(--선진);background:#fff;border-radius:10px;padding:7px 14px;font-size:13.5px;
+      font-weight:700;color:var(--중간글);cursor:pointer;font-variant-numeric:tabular-nums;
+      transition:all .13s}
+  .알:hover{border-color:var(--초록선);background:var(--초록연);color:var(--초록)}
+  .알.켬{background:linear-gradient(135deg,#17795b 0%,var(--초록) 100%);border-color:transparent;color:#fff;
+       box-shadow:0 3px 10px rgba(15,87,65,.26)}
+
+  /* ── 상품 줄 ── */
+  .상품{background:var(--판);border:1px solid var(--선);border-radius:15px;padding:15px 17px;margin-bottom:9px;
+        display:grid;grid-template-columns:1fr 150px 108px 168px;gap:14px;align-items:center;
+        transition:border-color .13s,box-shadow .13s,transform .13s}
+  .상품:hover{border-color:var(--초록선);box-shadow:0 8px 22px rgba(16,50,40,.08);transform:translateY(-1px)}
+  .상품.할인중{border-color:var(--주황선);background:var(--주황연);
+        box-shadow:inset 3px 0 0 var(--주황)}
+  .이름줄{min-width:0}
+  .이름줄 .위글{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .이름줄 .제조사{font-size:11.5px;font-weight:800;color:#fff;border-radius:6px;padding:3.5px 8px;
+       letter-spacing:.2px}
+  .이름줄 .모델{font-size:16px;font-weight:800;letter-spacing:-.3px}
+  .이름줄 .제품{font-size:13.5px;color:var(--흐림)}
+  .이름줄 .아래글{margin-top:6px;font-size:13px;color:var(--중간글);font-variant-numeric:tabular-nums}
+  .이름줄 .아래글 b{font-weight:800;color:var(--글);letter-spacing:.2px}
+  .계절{margin-left:7px;font-size:11.5px;font-weight:700;border-radius:6px;padding:2.5px 8px}
+  .계절.사계절{color:#04785c;background:#e6f6f0}
+  .계절.여름{color:#1b64c4;background:#e9f2fe}
+  .계절.겨울{color:#0c6b8f;background:#e5f5fb}
+  .계절.SUV{color:#8a5a06;background:#fdf3e0}
+
+  .원가{text-align:right;font-variant-numeric:tabular-nums}
+  .원가 .수{font-size:17px;font-weight:800;color:var(--중간글)}
+  .원가 .말{font-size:11.5px;color:var(--흐림);display:block;margin-top:2px}
+  .dc{text-align:center}
+  .dc input{width:66px;height:37px;border:1.5px solid var(--선진);border-radius:10px;text-align:right;
+       padding:0 22px 0 8px;font-size:15px;font-variant-numeric:tabular-nums;outline:none;
+       transition:border-color .13s,box-shadow .13s}
+  .dc input:focus{border-color:var(--주황);box-shadow:0 0 0 3px #fdeadb}
+  .dc span{margin-left:-18px;font-size:12px;color:var(--흐림)}
+  .할인{text-align:right}
+  .할인 .수{font-size:20px;font-weight:800;color:var(--주황);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+  .할인 .말{display:block;font-size:11.5px;color:var(--흐림);margin-top:2px}
+  .금배지{display:inline-block;font-size:10.5px;font-weight:800;color:var(--금);background:var(--금연);
+       border:1px solid #f0dcae;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:2px}
+
+  .없음{background:var(--판);border:1px dashed var(--선진);border-radius:15px;padding:52px;
+        text-align:center;color:#a3ada8}
+  .더{display:block;width:100%;margin:8px 0 60px;height:50px;border:1px solid var(--선진);background:#fff;
+      border-radius:13px;font-size:14.5px;font-weight:700;color:var(--중간글);cursor:pointer;
+      transition:all .13s}
+  .더:hover{border-color:var(--초록선);background:var(--초록연);color:var(--초록)}
+
+  @media (max-width:860px){
+    .상품{grid-template-columns:1fr 1fr;gap:10px}
+    .이름줄{grid-column:1/-1}
+    .한칸{align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="시안표시">후보 D</div>
+
+<header><div class="줄 위">
+  <div class="로고"><span class="마크"></span>타이어<b>공장도가격</b></div>
+  <div class="광고">광고 자리</div>
+</div></header>
+
+<div class="줄">
+  <div class="고르판">
+    <div class="찾기">
+      <input id="검색칸" type="search" placeholder="규격이나 제품명으로 찾기  (예: 2454518 · 245/45R18 · 벤투스)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+    </div>
+    <div class="한칸"><b>제조사</b><div class="알들" id="제조사"></div></div>
+  </div>
+
+  <div id="목록"></div>
+  <button class="더" id="더">더 보기</button>
+</div>
+
+<script src="후보-자료.js"></script>
+<script>
+const 제조사고름 = new Set();
+const 한번에 = 100;                 /* 한 번에 보여주는 줄 수 */
+let 말 = '', 보이는수 = 한번에;
+
+/* 제조사마다 제 색 — 표에서 눈으로 바로 갈라진다 */
+const 제조사색 = {
+  '한국':'#c2410c', '금호':'#1d4ed8', '넥센':'#7c3aed', '던롭':'#b91c1c', '굿이어':'#0369a1',
+  '요코하마':'#0f766e', '미쉐린':'#1e40af', '콘티넨탈':'#a16207', '브리지스톤':'#be123c', '피렐리':'#4338ca'
+};
+const 색 = b => 제조사색[b] || '#0f5741';
+
+document.getElementById('제조사').innerHTML = ['한국','금호','넥센','던롭','굿이어','요코하마']
+  .map(b => `<button class="알" data-제조사="${b}">${b}</button>`).join('');
+
+function 그리기(){
+  const 결과 = 걸러내기(자료, 말, 제조사고름, null);
+  const 최저 = 결과.length ? Math.min(...결과.map(r => r[6])) : 0;
+
+  const 조각 = 결과.slice(0, 보이는수);
+  document.getElementById('목록').innerHTML = 조각.map(r => `
+    <div class="상품" data-row data-price="${r[6]}">
+      <div class="이름줄">
+        <div class="위글">
+          <span class="제조사" style="background:${색(r[0])}">${r[0]}</span>
+          <span class="모델">${r[1]}</span>
+          <span class="제품">${r[2]}</span>
+        </div>
+        <div class="아래글"><b>${r[3]}</b> ${r[4]}<span class="계절 ${r[5]}">${r[5]}</span></div>
+      </div>
+      <div class="원가"><span class="수">${돈(r[6])}</span><span class="말">공장도가 (원)</span></div>
+      <div class="dc"><input data-dc type="number" min="0" max="95"><span>%</span></div>
+      <div class="할인"><span class="수" data-sale>${돈(r[6])}</span>${r[6] === 최저 ? '<span class="금배지">최저</span>' : ''}<span class="말">할인가 (원)</span></div>
+    </div>`).join('') || '<div class="없음">찾는 조건에 맞는 상품이 없습니다.</div>';
+
+  const 더 = document.getElementById('더');
+  더.style.display = 결과.length > 보이는수 ? 'block' : 'none';
+  더.textContent = '더 보기 (' + (결과.length - 보이는수) + '개 남음)';
+}
+
+document.getElementById('제조사').addEventListener('click', e => {
+  const b = e.target.closest('.알'); if (!b) return;
+  const 이름 = b.dataset.제조사;
+  제조사고름.has(이름) ? 제조사고름.delete(이름) : 제조사고름.add(이름);
+  b.classList.toggle('켬'); 보이는수 = 한번에; 그리기();
+});
+document.getElementById('검색칸').addEventListener('input', e => {
+  말 = e.target.value; 보이는수 = 한번에; 그리기();
+});
+document.getElementById('더').addEventListener('click', () => { 보이는수 += 한번에; 그리기(); });
+
+DC묶기(document.body);
+그리기();
+</script>
+</body>
+</html>

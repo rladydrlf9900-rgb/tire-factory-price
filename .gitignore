@@ -4,6 +4,9 @@
 웹/data/cache/
 웹/assets/price.json
 
+# 내 컴퓨터에서만 쓰는 미리보기 설정 (서버에는 올리지 않는다)
+웹/설정.local.php
+
 # 임시 · 시스템 파일
 *.sqlite
 *.log

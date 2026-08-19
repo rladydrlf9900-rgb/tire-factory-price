@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후보 B — 검정 머리 | 타이어공장도가격 시안</title>
+<style>
+  :root{
+    --먹:#0f1523; --먹2:#1b2333; --바탕:#f4f6fa; --판:#fff; --선:#e3e7ef;
+    --글:#131823; --흐림:#6b7488; --노랑:#ffc93c; --주황:#f2670a; --초록:#12a06a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--바탕);color:var(--글);
+       font:15px/1.55 -apple-system,'Segoe UI','맑은 고딕','Malgun Gothic',sans-serif}
+  .시안표시{position:fixed;left:14px;bottom:14px;z-index:9;background:#fff;color:#0f1523;
+       padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+
+  /* 검정 머리 */
+  .머리{background:var(--먹);background-image:linear-gradient(160deg,#1a2440 0%,#0f1523 62%,#141c2e 100%);color:#fff}
+  .줄{max-width:1340px;margin:0 auto;padding:0 24px}
+  .위{display:flex;align-items:center;gap:14px;padding:16px 0}
+  .로고{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;letter-spacing:-.4px}
+  .마크{width:27px;height:27px;border-radius:9px;background:var(--노랑);position:relative}
+  .마크:after{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--먹)}
+  .위 .메뉴{margin-left:auto;display:flex;gap:20px;font-size:13.5px;color:#9aa3b8;font-weight:600}
+  .위 .메뉴 span{cursor:pointer}
+  .위 .메뉴 span:hover{color:#fff}
+
+  .큰{padding:26px 0 30px;text-align:center}
+  .큰 h1{margin:0 0 6px;font-size:27px;font-weight:800;letter-spacing:-.8px}
+  .큰 p{margin:0 0 20px;color:#98a2b8;font-size:14.5px}
+  .큰 .찾기{max-width:680px;margin:0 auto;position:relative}
+  .큰 input{width:100%;height:56px;border:0;border-radius:14px;padding:0 18px 0 50px;font-size:16px;
+       outline:none;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  .큰 svg{position:absolute;left:18px;top:18px;width:20px;height:20px;color:#8b93a6}
+  .보기말{margin-top:12px;font-size:12.5px;color:#7d879c}
+  .보기말 b{color:var(--노랑);font-weight:700}
+
+  /* 브랜드 타일 */
+  .타일줄{max-width:1340px;margin:-22px auto 0;padding:0 24px;position:relative;z-index:2}
+  .타일{display:grid;grid-template-columns:repeat(10,1fr);gap:9px}
+  .타일 button{background:var(--판);border:1px solid var(--선);border-radius:12px;padding:11px 6px;
+       cursor:pointer;text-align:center;box-shadow:0 3px 10px rgba(16,24,40,.05)}
+  .타일 button:hover{border-color:var(--먹);transform:translateY(-2px)}
+  .타일 button.켬{background:var(--먹);border-color:var(--먹);color:#fff}
+  .타일 b{display:block;font-size:13.5px;font-weight:700}
+  .타일 i{display:block;font-style:normal;font-size:11.5px;color:var(--흐림);margin-top:3px;font-variant-numeric:tabular-nums}
+  .타일 button.켬 i{color:#c9d0e0}
+
+  /* 몸통 */
+  .몸{max-width:1340px;margin:0 auto;padding:22px 24px 60px}
+  .띠{display:flex;align-items:center;gap:10px;margin:22px 0 12px;flex-wrap:wrap}
+  .띠 strong{font-size:17px;letter-spacing:-.3px}
+  .띠 em{font-style:normal;color:var(--흐림);font-size:13px}
+  .띠 .계절칩{margin-left:auto;display:flex;gap:6px}
+  .계절칩 button{border:1px solid var(--선);background:#fff;border-radius:999px;padding:6px 14px;
+       font-size:13px;font-weight:600;color:#495060;cursor:pointer}
+  .계절칩 button.켬{background:var(--먹);border-color:var(--먹);color:#fff}
+
+  .판{background:var(--판);border:1px solid var(--선);border-radius:16px;overflow:hidden;
+      box-shadow:0 6px 24px rgba(16,24,40,.05)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:12px;color:#7c8496;font-weight:700;text-align:left;padding:13px 16px;
+     border-bottom:1px solid var(--선);white-space:nowrap;letter-spacing:.2px}
+  td{padding:13px 16px;border-bottom:1px solid #f1f3f8;font-size:14.5px}
+  tbody tr:nth-child(even){background:#fbfcfe}
+  tbody tr:hover{background:#fff8ec}
+  tbody tr.할인중 td.할인{color:var(--주황)}
+  .제조사{font-weight:800;letter-spacing:-.2px}
+  .규격{font-variant-numeric:tabular-nums;font-weight:700}
+  .규격 i{font-style:normal;color:var(--흐림);font-size:12.5px;margin-left:6px;font-weight:500}
+  .계절{font-size:12px;font-weight:700;color:#5c6577}
+  .원가{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;white-space:nowrap}
+  .원가 u{text-decoration:none;color:var(--흐림);font-size:11.5px;margin-left:2px}
+  .dc{text-align:center}
+  .dc input{width:64px;height:34px;border:1.5px solid var(--선);border-radius:9px;text-align:right;
+       padding:0 22px 0 8px;font-size:14.5px;font-variant-numeric:tabular-nums;outline:none;background:#fbfcfe}
+  .dc input:focus{border-color:var(--먹);background:#fff}
+  .dc span{margin-left:-18px;font-size:12px;color:var(--흐림)}
+  .할인{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;font-size:17px;white-space:nowrap}
+  .할인 u{text-decoration:none;font-size:11.5px;color:var(--흐림);margin-left:2px;font-weight:600}
+  .싼{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:800;color:#fff;background:var(--초록);
+      border-radius:5px;padding:2px 6px;vertical-align:2px}
+  .쪽{display:flex;justify-content:center;gap:6px;padding:18px}
+  .쪽 button{min-width:36px;height:36px;border:1px solid var(--선);background:#fff;border-radius:10px;
+       font-weight:700;font-size:13.5px;color:#3d4553;cursor:pointer}
+  .쪽 button.켬{background:var(--먹);border-color:var(--먹);color:#fff}
+  @media (max-width:1000px){ .타일{grid-template-columns:repeat(5,1fr)} }
+  @media (max-width:640px){ .타일{grid-template-columns:repeat(3,1fr)} .큰 h1{font-size:22px} }
+</style>
+</head>
+<body>
+<div class="시안표시">후보 B — 검정 머리</div>
+
+<div class="머리">
+  <div class="줄 위">
+    <div class="로고"><span class="마크"></span>타이어<b>공장도가격</b></div>
+    <div class="메뉴"><span>규격으로 찾기</span><span>제조사별</span><span>오늘 바뀐 가격</span></div>
+  </div>
+  <div class="줄 큰">
+    <h1>전 브랜드 타이어 공장도가, 한 화면에서</h1>
+    <p>로그인 없이 바로 조회 · DC율을 넣으면 할인가가 즉시 계산됩니다</p>
+    <div class="찾기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="검색칸" type="search" placeholder="벤투스 · 225/45R18 · 2254518 · 18인치">
+    </div>
+    <div class="보기말">이렇게 넣어도 찾습니다 — <b>1756514</b> · <b>175 65 14</b> · <b>엔페라</b> · <b>r16</b></div>
+  </div>
+</div>
+
+<div class="타일줄"><div class="타일" id="타일"></div></div>
+
+<div class="몸">
+  <div class="띠">
+    <strong id="세기">30개 품목</strong>
+    <em>1본 기준 · 부가세 별도 · 어제 넥센 가격표가 갱신되었습니다</em>
+    <div class="계절칩" id="계절칩"></div>
+  </div>
+
+  <div class="판">
+    <table>
+      <thead><tr>
+        <th style="width:100px">제조사</th><th>모델</th><th style="width:130px">제품명</th>
+        <th style="width:175px">규격</th><th style="width:74px">계절</th>
+        <th style="width:125px;text-align:right">공장도가</th>
+        <th style="width:100px;text-align:center">DC율</th>
+        <th style="width:165px;text-align:right">할인가</th>
+      </tr></thead>
+      <tbody id="줄들"></tbody>
+    </table>
+    <div class="쪽" id="쪽"></div>
+  </div>
+</div>
+
+<script src="후보-자료.js"></script>
+<script>
+const 제조사고름 = new Set(), 계절고름 = new Set();
+let 말 = '', 쪽번호 = 1;
+const 한쪽 = 12;
+
+document.getElementById('타일').innerHTML = 제조사목록.map(b => {
+  const 것 = 자료.filter(r => r[0] === b);
+  const 최저 = 것.length ? Math.min(...것.map(r => r[6])) : 0;
+  return `<button data-제조사="${b}"><b>${b}</b><i>${최저 ? 돈(최저) + '~' : '준비중'}</i></button>`;
+}).join('');
+document.getElementById('계절칩').innerHTML = ['사계절','여름','SUV'].map(s =>
+  `<button data-계절="${s}">${s}</button>`).join('');
+
+function 그리기(){
+  const 결과 = 걸러내기(자료, 말, 제조사고름, 계절고름);
+  const 최저 = 결과.length ? Math.min(...결과.map(r => r[6])) : 0;
+  const 총쪽 = Math.max(1, Math.ceil(결과.length / 한쪽));
+  if (쪽번호 > 총쪽) 쪽번호 = 총쪽;
+  const 조각 = 결과.slice((쪽번호 - 1) * 한쪽, 쪽번호 * 한쪽);
+
+  document.getElementById('세기').textContent = 결과.length + '개 품목';
+  document.getElementById('줄들').innerHTML = 조각.map(r => `
+    <tr data-row data-price="${r[6]}">
+      <td class="제조사">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td>
+      <td class="규격">${r[3]}<i>${r[4]}</i></td>
+      <td class="계절">${r[5]}</td>
+      <td class="원가">${돈(r[6])}<u>원</u></td>
+      <td class="dc"><input data-dc type="number" min="0" max="95"><span>%</span></td>
+      <td class="할인"><span data-sale>${돈(r[6])}</span><u>원</u>${r[6] === 최저 ? '<span class="싼">최저</span>' : ''}</td>
+    </tr>`).join('') || '<tr><td colspan="8" style="padding:56px;text-align:center;color:#98a1b0">찾는 조건에 맞는 상품이 없습니다.</td></tr>';
+
+  document.getElementById('쪽').innerHTML = Array.from({length: 총쪽}, (_, i) =>
+    `<button class="${i + 1 === 쪽번호 ? '켬' : ''}" data-쪽="${i + 1}">${i + 1}</button>`).join('');
+}
+
+document.getElementById('검색칸').addEventListener('input', e => { 말 = e.target.value; 쪽번호 = 1; 그리기(); });
+document.getElementById('타일').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const 이름 = b.dataset.제조사;
+  제조사고름.has(이름) ? 제조사고름.delete(이름) : 제조사고름.add(이름);
+  b.classList.toggle('켬'); 쪽번호 = 1; 그리기();
+});
+document.getElementById('계절칩').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const s = b.dataset.계절;
+  계절고름.has(s) ? 계절고름.delete(s) : 계절고름.add(s);
+  b.classList.toggle('켬'); 쪽번호 = 1; 그리기();
+});
+document.getElementById('쪽').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  쪽번호 = +b.dataset.쪽; 그리기(); window.scrollTo({top: 220, behavior: 'smooth'});
+});
+DC묶기(document.body);
+그리기();
+</script>
+</body>
+</html>

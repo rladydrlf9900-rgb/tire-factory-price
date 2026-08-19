@@ -140,7 +140,7 @@ if ($action === 'upload') {
 
     try {
         $rows   = read_table($tmp, $name);
-        $parsed = parse_rows($rows, $brand);
+        $parsed = parse_rows($rows, $brand, true);   // 박스 이름대로 넣는다
     } catch (Throwable $e) {
         if ($partial) @unlink($partial);
         json_err($e->getMessage());
@@ -273,13 +273,35 @@ if ($action === 'rollback') {
     json_out(['ok' => true, 'restored' => count($old), 'brand' => $up['brand']]);
 }
 
+/* ── 올린 기록 지우기 ──────────────────────────────────
+   기록과 원본 파일만 지운다. 지금 사이트에 올라가 있는 가격은 건드리지 않는다.
+   (가격을 되돌리려면 '되돌리기' 를 쓴다) */
+if ($action === 'upload_del') {
+    $id = (int)($_POST['id'] ?? 0);
+    $st = db()->prepare('SELECT id, brand, filename FROM uploads WHERE id = ?');
+    $st->execute([$id]);
+    $up = $st->fetch();
+    if (!$up) json_err('그런 기록이 없습니다.', 404);
+
+    /* 보관해 둔 원본 파일도 같이 지운다 */
+    $dir = __DIR__ . '/../data/files';
+    foreach (['xlsx', 'csv', 'dat'] as $ext) {
+        $f = $dir . '/' . $id . '.' . $ext;
+        if (is_file($f)) @unlink($f);
+    }
+    db()->prepare('DELETE FROM uploads WHERE id = ?')->execute([$id]);
+
+    cache_clear();
+    json_out(['ok' => true, 'brand' => $up['brand'], 'filename' => $up['filename']]);
+}
+
 /* ── 제조사 추가 / 삭제 / 순서 ─────────────────────────── */
 if ($action === 'brand_add') {
     $name = trim((string)($_POST['name'] ?? ''));
     if ($name === '') json_err('제조사 이름을 입력해 주세요.');
     // MySQL 은 넣는 표를 그 안에서 다시 읽지 못하므로 순서번호를 먼저 구한다
     $next = (int)db()->query('SELECT COALESCE(MAX(sort_no), 0) + 1 FROM brands')->fetchColumn();
-    $st = db()->prepare('INSERT IGNORE INTO brands (name, sort_no) VALUES (?, ?)');
+    $st = db()->prepare(sql_insert_ignore() . ' brands (name, sort_no) VALUES (?, ?)');
     $st->execute([mb_substr($name, 0, 40), $next]);
     cache_clear();
     json_out(['ok' => true]);

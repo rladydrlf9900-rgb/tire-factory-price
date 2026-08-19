@@ -15,7 +15,7 @@
     });
   };
 
-  var PER = 30;
+  var PER = (window.__PER | 0) || 100;
 
   var toastTimer;
   function toast(msg) {
@@ -36,7 +36,7 @@
      ============================================================ */
   var ALL = [];               // 전체 가격표
   var ready = false;
-  var S = { q: "", brands: [], seasons: [], page: 1 };
+  var S = { q: "", brands: [], page: 1 };
   var DCMAP = {}, VIEW = [];
   var Q = null;               // 해석해 둔 검색어
 
@@ -95,15 +95,15 @@
 
   function match(r) {
     if (S.brands.length && S.brands.indexOf(r.brand) === -1) return false;
-    if (S.seasons.length && S.seasons.indexOf(r.season) === -1) return false;
     if (!Q) return true;
 
     if (Q.inch) {
       return sizeDigits(r).slice(-2) === Q.inch;
     }
     if (Q.size) {
-      // 앞에서부터 맞으면 통과 : 175 → 175/xx, 17565 → 175/65, 1756514 → 정확히
-      return sizeDigits(r).indexOf(Q.size) === 0;
+      // 규격은 다 쳐야 나온다 : 15512 → 155R12, 2254518 → 225/45R18
+      // 155 처럼 앞자리만 치면 나오지 않는다 (수만 건에서 앞자리만 맞는 것이 쏟아지지 않게)
+      return sizeDigits(r) === Q.size;
     }
     var hay = (r.brand + r.model + r.product + r.size + r.spec).toLowerCase().replace(/[\s/\-]/g, "");
     return hay.indexOf(Q.text) !== -1;
@@ -111,52 +111,57 @@
 
   function rowHtml(r, i) {
     var dc = dcOf(i);
-    return '<tr data-i="' + i + '">' +
-      '<td class="c-brand">' + esc(r.brand) + "</td>" +
-      '<td class="c-model">' + esc(r.model) + "</td>" +
-      '<td class="c-name">' + esc(r.product) + "</td>" +
-      '<td class="c-spec num">' + esc(r.size) + " <i>" + esc(r.spec) + "</i></td>" +
-      '<td class="t-c" style="font-size:12.5px;color:var(--ink-2);font-weight:600">' + esc(r.season) + "</td>" +
-      '<td class="t-r"><span class="c-fac num">' + won(r.price) + "</span><u>원</u></td>" +
-      '<td class="t-c"><span class="dccell">' +
-        '<input class="dcinp num' + (dc > 0 ? " set" : "") + '" type="number" min="0" max="95" value="' + (dc ? dc : "") + '" aria-label="DC율">' +
-        '<span class="pc">%</span></span></td>' +
-      '<td class="t-r"><span class="c-sale num" data-sale>' + won(salePrice(r.price, dc)) + '</span><span class="won">원</span></td>' +
-    "</tr>";
-  }
-
-  function cardHtml(r, i) {
-    var dc = dcOf(i);
-    return '<div class="mcard" data-i="' + i + '">' +
-      '<div class="r1"><b>' + esc(r.brand) + '</b><span style="font-size:11.5px;color:var(--ink-3);font-weight:700">' + esc(r.season) + "</span></div>" +
-      "<h4>" + esc(r.product) + " " + esc(r.model) + "</h4>" +
-      '<div class="sz num">' + esc(r.size) + " " + esc(r.spec) + "</div>" +
-      '<div class="pr">' +
-        '<div><span class="lb">공장도가</span><span class="c-fac num">' + won(r.price) + "원</span></div>" +
-        '<div><span class="lb">DC율</span><span class="dccell">' +
+    return '<div class="pcard" data-i="' + i + '">' +
+      '<div class="pname">' +
+        '<div class="pline">' +
+          '<span class="bb" data-b="' + esc(r.brand) + '">' + esc(r.brand) + "</span>" +
+          '<span class="mo">' + esc(r.model) + "</span>" +
+          '<span class="pr">' + (r.product ? "/ " + esc(r.product) : "") + "</span>" +
+        "</div>" +
+        '<div class="bot num"><b>' + esc(r.size) + "</b> <i>" + esc(r.spec) + "</i></div>" +
+      "</div>" +
+      '<div class="nums">' +
+        '<div class="col fac"><span class="c-fac num">' + won(r.price) + "</span>" +
+          '<span class="lb">공장도가 (원)</span></div>' +
+        '<div class="col dcc"><span class="dccell">' +
           '<input class="dcinp num' + (dc > 0 ? " set" : "") + '" type="number" min="0" max="95" value="' + (dc ? dc : "") + '" aria-label="DC율">' +
-          '<span class="pc">%</span></span></div>' +
-        '<div style="margin-left:auto;text-align:right"><span class="lb">할인가</span>' +
-          '<span class="c-sale num" data-sale>' + won(salePrice(r.price, dc)) + '</span><span class="won">원</span></div>' +
+          '<span class="pc">%</span></span><span class="lb">DC율</span></div>' +
+        '<div class="col sal"><span class="c-sale num" data-sale>' + won(salePrice(r.price, dc)) + "</span>" +
+          '<span class="lb">할인가 (원)</span></div>' +
       "</div>" +
     "</div>";
   }
+
+  /* 제조사 박스 순서 — 첫 화면 차례를 정한다 */
+  var BRAND_RANK = {};
+  (window.__BRANDS || []).forEach(function (b, i) { BRAND_RANK[b] = i; });
+  function brandRank(b) { var v = BRAND_RANK[b]; return v === undefined ? 9999 : v; }
 
   function render() {
     if (!ready) return;
 
     var list = ALL.filter(match);
+
+    /* 제조사를 안 고른 동안은 제조사 차례대로 보여준다 (같은 제조사 안에서는 싼 것부터).
+       규격을 검색해도 마찬가지다 — 한국 것부터 쭉 보고 다음 제조사로 넘어간다.
+       제조사 단추를 누르면 그때부터 가격순으로 바뀐다. */
+    if (!S.brands.length) {
+      list = list.slice().sort(function (a, b) {
+        return brandRank(a.brand) - brandRank(b.brand) || a.price - b.price;
+      });
+      /* 검색도 안 했으면 첫 화면이므로 100개까지만 */
+      if (!S.q) list = list.slice(0, PER);
+    }
+
     var pages = Math.max(1, Math.ceil(list.length / PER));
     if (S.page > pages) S.page = pages;
     VIEW = list.slice((S.page - 1) * PER, S.page * PER);
 
     if (!VIEW.length) {
       var msg = '<div class="empty"><b>조건에 맞는 상품이 없습니다.</b>검색어나 제조사를 바꿔 보세요.</div>';
-      $("#rows").innerHTML = '<tr><td colspan="8">' + msg + "</td></tr>";
-      $("#mrows").innerHTML = msg;
+      $("#rows").innerHTML = msg;
     } else {
       $("#rows").innerHTML = VIEW.map(rowHtml).join("");
-      $("#mrows").innerHTML = VIEW.map(cardHtml).join("");
     }
 
     var out = ['<button ' + (S.page === 1 ? "disabled" : "") + ' data-p="' + (S.page - 1) + '">‹</button>'];
@@ -168,28 +173,21 @@
     out.push('<button ' + (S.page === pages ? "disabled" : "") + ' data-p="' + (S.page + 1) + '">›</button>');
     $("#pager").innerHTML = pages > 1 ? out.join("") : "";
 
-    drawChips(list.length);
-    updateFilterLabel();
+    drawChips();
   }
 
-  function drawChips(total) {
-    var c = [];
-    S.brands.forEach(function (b) { c.push(["brand:" + b, b]); });
-    S.seasons.forEach(function (s) { c.push(["season:" + s, s]); });
-    if (S.q) c.push(["q", '"' + S.q + '"']);
+  /* 검색어만 보여준다. 제조사는 위 단추가 켜진 것으로 바로 보인다 */
+  function drawChips() {
+    var 켜짐 = S.q || S.brands.length;
     var box = $("#chips");
-    box.hidden = !c.length;
-    if (!c.length) return;
+    box.hidden = !켜짐;
+    if (!켜짐) return;
     box.innerHTML =
-      '<span class="cnt-badge num">' + won(total) + "건</span>" +
-      c.map(function (x) {
-        return '<button class="fchip" data-x="' + esc(x[0]) + '">' + esc(x[1]) + "</button>";
-      }).join("") +
-      (c.length > 1 ? '<button class="btn btn-quiet btn-sm" data-x="all">전체 해제</button>' : "");
+      (S.q ? '<button class="fchip" data-x="q">' + esc('"' + S.q + '"') + "</button>" : "");
   }
 
   function applyDc(inp) {
-    var box = inp.closest("tr") || inp.closest(".mcard");
+    var box = inp.closest(".pcard");
     if (!box) return;
     var i = +box.dataset.i, rec = VIEW[i];
     var raw = String(inp.value).replace(/[^\d]/g, "");
@@ -197,6 +195,7 @@
     if (v > 95) { v = 95; inp.value = 95; }
     DCMAP[i] = v;
     inp.classList.toggle("set", v > 0);
+    box.classList.toggle("on", v > 0);
 
     var cell = $("[data-sale]", box);
     if (!cell) return;
@@ -209,53 +208,39 @@
       if (fac) cell.textContent = won(salePrice(fac, v));
     }
   }
-  ["#rows", "#mrows"].forEach(function (sel) {
-    $(sel).addEventListener("input", function (e) {
-      var inp = e.target.closest(".dcinp");
-      if (inp) applyDc(inp);
-    });
+  $("#rows").addEventListener("input", function (e) {
+    var inp = e.target.closest(".dcinp");
+    if (inp) applyDc(inp);
   });
 
-  $("#brandlist").addEventListener("change", function (e) {
-    var v = e.target.value;
-    if (e.target.checked) S.brands.push(v);
-    else S.brands = S.brands.filter(function (x) { return x !== v; });
+  /* 제조사 단추 — 누르면 켜지고 다시 누르면 꺼진다. 여러 개를 같이 켤 수 있다 */
+  $("#brandlist").addEventListener("click", function (e) {
+    var b = e.target.closest(".bchip");
+    if (!b) return;
+    var v = b.dataset.b;
+    var i = S.brands.indexOf(v);
+    if (i === -1) S.brands.push(v); else S.brands.splice(i, 1);
+    b.classList.toggle("on", S.brands.indexOf(v) !== -1);
     S.page = 1; clearDc(); render();
   });
-  if ($("#seasonlist")) {
-    $("#seasonlist").addEventListener("change", function (e) {
-      var v = e.target.value;
-      if (e.target.checked) S.seasons.push(v);
-      else S.seasons = S.seasons.filter(function (x) { return x !== v; });
-      S.page = 1; clearDc(); render();
-    });
+
+  /* 검색은 Enter 나 돋보기를 눌렀을 때만 한다.
+     한 글자 칠 때마다 찾으면 품목이 수만 개로 늘었을 때 화면이 버벅인다.
+     "1956515" 를 다 치고 Enter → 그때 한 번만 걸러낸다. */
+  function runSearch() {
+    S.q = $("#q").value.trim();
+    Q = parseQuery(S.q);
+    S.page = 1; clearDc(); render();
   }
-
-  /* 휴대폰에서 필터 접었다 펴기 (PC 에서는 버튼이 보이지 않아 동작하지 않는다) */
-  (function filterToggle() {
-    var btn = $("#filterbtn"), rail = $("#rail");
-    if (!btn || !rail) return;
-    btn.addEventListener("click", function () {
-      var open = rail.classList.toggle("open");
-      btn.classList.toggle("open", open);
-      btn.setAttribute("aria-expanded", String(open));
-    });
-  })();
-
-  /* 고른 개수를 버튼에 보여준다 */
-  function updateFilterLabel() {
-    var el = $("#filterbtn-label");
-    if (!el) return;
-    var n = S.brands.length + S.seasons.length;
-    el.innerHTML = n ? "제조사 · 계절 골라보기 <b>" + n + "개 선택</b>" : "제조사 · 계절 골라보기";
-  }
-
-  var qTimer;
-  $("#q").addEventListener("input", function () {
-    var v = this.value;
-    clearTimeout(qTimer);
-    qTimer = setTimeout(function () { S.q = v.trim(); Q = parseQuery(S.q); S.page = 1; clearDc(); render(); }, 180);
+  $("#q").addEventListener("keydown", function (e) {
+    // 한글은 글자를 맞추는 중에도 Enter 가 들어온다. 다 맞춰진 뒤에만 찾는다
+    if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    runSearch();
   });
+  $("#qgo").addEventListener("click", runSearch);
+  // 입력칸 오른쪽 × 로 비우면 바로 전체 목록으로 되돌린다
+  $("#q").addEventListener("search", function () { if (!this.value) runSearch(); });
 
   $("#pager").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-p]");
@@ -264,27 +249,41 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  /* 검색어 딱지의 ✕ 를 누르면 검색어를 지운다 */
   $("#chips").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-x]");
+    var b = e.target.closest('[data-x="q"]');
     if (!b) return;
-    var x = b.dataset.x;
-    if (x === "all") {
-      S.q = ""; Q = null; S.brands = []; S.seasons = [];
-      $("#q").value = "";
-      $$("#brandlist input, #seasonlist input").forEach(function (i) { i.checked = false; });
-    } else if (x === "q") {
-      S.q = ""; Q = null; $("#q").value = "";
-    } else if (x.indexOf("brand:") === 0) {
-      var bn = x.slice(6);
-      S.brands = S.brands.filter(function (v) { return v !== bn; });
-      $$("#brandlist input").forEach(function (i) { if (i.value === bn) i.checked = false; });
-    } else if (x.indexOf("season:") === 0) {
-      var sn = x.slice(7);
-      S.seasons = S.seasons.filter(function (v) { return v !== sn; });
-      $$("#seasonlist input").forEach(function (i) { if (i.value === sn) i.checked = false; });
-    }
+    $("#q").value = "";
+    S.q = ""; Q = null;
     S.page = 1; clearDc(); render();
   });
+
+  /* ============================================================
+     5분 동안 아무도 안 만지면 처음 화면으로 되돌린다.
+     매장에 걸어두는 화면이라, 손님이 고르고 간 검색어·제조사가
+     그대로 남아 있으면 다음 손님이 엉뚱한 목록을 본다.
+     ============================================================ */
+  var 되돌리는시간 = 5 * 60 * 1000;
+  var 대기시계;
+
+  function 처음화면으로() {
+    if (!$("#view-admin").hidden) return;        // 관리자 화면을 보고 있으면 건드리지 않는다
+    if (!S.q && !S.brands.length) return;        // 이미 처음 화면이면 할 일 없다
+    S.q = ""; Q = null; S.brands = [];
+    $("#q").value = "";
+    $$("#brandlist .bchip").forEach(function (b) { b.classList.remove("on"); });
+    S.page = 1; clearDc(); render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function 시계다시() {
+    clearTimeout(대기시계);
+    대기시계 = setTimeout(처음화면으로, 되돌리는시간);
+  }
+  ["click", "keydown", "input", "scroll", "touchstart", "wheel"].forEach(function (ev) {
+    window.addEventListener(ev, 시계다시, { passive: true });
+  });
+  시계다시();
 
   /* ============================================================
      관리자
@@ -323,9 +322,12 @@
       .catch(function () { err.textContent = "서버에 연결하지 못했습니다."; err.hidden = false; });
   }
 
+  /* 관리자 문 — 두 번 눌러야 열린다.
+     손님이 로고를 한 번 눌렀다고 비밀번호 창이 뜨면 놀라니까. */
   var mk = $("#mk-admin");
   if (mk) {
-    mk.addEventListener("click", function (e) { e.preventDefault(); openLock(); });
+    mk.addEventListener("click", function (e) { e.preventDefault(); });
+    mk.addEventListener("dblclick", function (e) { e.preventDefault(); openLock(); });
   }
   $("#lockok").addEventListener("click", tryEnter);
   $("#lockno").addEventListener("click", function () { veil.hidden = true; });
@@ -418,6 +420,7 @@
               (Number(h.restored)
                 ? '<span class="pill none">되돌림</span>'
                 : '<button class="btn btn-out btn-sm" data-roll="' + h.id + '">되돌리기</button>') +
+              ' <button class="btn btn-del btn-sm" data-updel="' + h.id + '" data-now="' + (isNow ? "1" : "") + '">지우기</button>' +
             "</td>" +
           "</tr>";
         }).join("")
@@ -594,10 +597,23 @@
 
   $("#hrows").addEventListener("click", function (e) {
     var b = e.target.closest("[data-roll]");
-    if (!b) return;
-    if (!confirm("이 업로드 전으로 되돌릴까요?")) return;
-    post({ action: "rollback", id: b.dataset.roll }).then(function (d) {
-      toast(d.ok ? d.brand + " 가격표를 되돌렸습니다." : (d.error || "되돌리지 못했습니다."));
+    if (b) {
+      if (!confirm("이 업로드 전으로 되돌릴까요?")) return;
+      post({ action: "rollback", id: b.dataset.roll }).then(function (d) {
+        toast(d.ok ? d.brand + " 가격표를 되돌렸습니다." : (d.error || "되돌리지 못했습니다."));
+        loadAdmin();
+      });
+      return;
+    }
+
+    var x = e.target.closest("[data-updel]");
+    if (!x) return;
+    var 물음 = x.dataset.now === "1"
+      ? "지금 사이트에 적용 중인 가격표의 기록입니다.\n\n기록과 원본 파일만 지워지고 가격은 그대로 남습니다.\n대신 이 파일을 다시 받거나 이 시점으로 되돌릴 수 없게 됩니다.\n\n지울까요?"
+      : "이 기록과 보관된 원본 파일을 지울까요?\n지우면 이 시점으로 되돌릴 수 없습니다.";
+    if (!confirm(물음)) return;
+    post({ action: "upload_del", id: x.dataset.updel }).then(function (d) {
+      toast(d.ok ? "기록을 지웠습니다." : (d.error || "지우지 못했습니다."));
       loadAdmin();
     });
   });

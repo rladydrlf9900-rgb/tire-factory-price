@@ -2,7 +2,7 @@
 <div id="view-admin" hidden>
   <header class="top">
     <div class="top-in">
-      <span class="logo"><span class="mk"></span><span class="txt">타이어<b>공장도가격</b> <span style="font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.08em">ADMIN</span></span></span>
+      <span class="logo"><span class="mk"><svg viewBox="0 0 192 192" aria-hidden="true" focusable="false"><rect width="192" height="192" rx="40" fill="currentColor"/><circle cx="96" cy="96" r="62" fill="none" stroke="#fff" stroke-width="21"/><rect x="96" y="87" width="36" height="19" fill="#fff"/></svg></span><span class="txt">타이어 <b>공장도가격</b> <i>- G</i> <span style="font-size:11px;font-weight:800;color:var(--ink-3);letter-spacing:.08em">ADMIN</span></span></span>
       <span style="flex:1"></span>
       <div class="top-right">
         <button class="btn btn-out btn-sm" id="btn-pw">비밀번호 변경</button>
