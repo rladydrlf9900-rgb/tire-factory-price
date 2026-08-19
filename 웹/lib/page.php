@@ -86,7 +86,7 @@ function row_html(array $r, int $i): string {
                 '<span class="lb">공장도가 (원)</span></div>' .
             '<div class="col dcc"><span class="dccell">' .
                 '<input class="dcinp num" type="number" min="0" max="95" value="" aria-label="DC율">' .
-                '<span class="pc">%</span></span><span class="lb">DC율</span></div>' .
+                '<span class="pc">%</span></span></div>' .
             '<div class="col sal"><span class="c-sale num" data-sale>' . money((int)$r['price']) . '</span>' .
                 '<span class="lb">할인가 (원)</span></div>' .
         '</div>' .

@@ -125,7 +125,7 @@
           '<span class="lb">공장도가 (원)</span></div>' +
         '<div class="col dcc"><span class="dccell">' +
           '<input class="dcinp num' + (dc > 0 ? " set" : "") + '" type="number" min="0" max="95" value="' + (dc ? dc : "") + '" aria-label="DC율">' +
-          '<span class="pc">%</span></span><span class="lb">DC율</span></div>' +
+          '<span class="pc">%</span></span></div>' +
         '<div class="col sal"><span class="c-sale num" data-sale>' + won(salePrice(r.price, dc)) + "</span>" +
           '<span class="lb">할인가 (원)</span></div>' +
       "</div>" +
@@ -239,8 +239,11 @@
     runSearch();
   });
   $("#qgo").addEventListener("click", runSearch);
-  // 입력칸 오른쪽 × 로 비우면 바로 전체 목록으로 되돌린다
-  $("#q").addEventListener("search", function () { if (!this.value) runSearch(); });
+
+  /* 검색어를 다 지우면 (× 를 누르든 하나씩 지우든) 곧바로 처음 화면으로 돌아간다.
+     글자가 남아 있는 동안에는 아무 일도 하지 않는다 — 칠 때마다 걸러내면 느려진다 */
+  $("#q").addEventListener("search", function () { if (!this.value) 처음화면으로(); });
+  $("#q").addEventListener("input",  function () { if (!this.value) 처음화면으로(); });
 
   $("#pager").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-p]");

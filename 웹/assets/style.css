@@ -280,7 +280,9 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
 .pcard .pname{flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:6px}
 .pcard .pname .pline{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
 .pcard .pname .mo{font-size:15.5px; font-weight:800; letter-spacing:-.02em}
-.pcard .pname .pr{font-size:13.5px; color:var(--ink-3)}
+/* 한글 이름 — 영문 모델과 갈라 보이도록 포인트 색.
+   할인가가 이미 주황이라, 겹치지 않게 사이트 중심색(파랑)을 쓴다 */
+.pcard .pname .pr{font-size:13.5px; font-weight:700; color:var(--brand)}
 .pcard .pname .bot{display:flex; align-items:center; gap:8px; flex-wrap:wrap;
                  font-size:13px; color:var(--ink-2)}
 .pcard .pname .bot b{font-size:13.5px; font-weight:800; color:var(--ink); letter-spacing:.01em}
