@@ -293,9 +293,16 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
 .pcard .col .lb{display:block; font-size:11.5px; color:var(--ink-3); margin-top:3px; font-weight:600}
 .pcard .col.fac{width:118px}
 .pcard .col.fac .c-fac{font-size:16.5px; font-weight:800; color:var(--ink-2)}
+/* 수량 칸 — DC 칸과 같은 모양이되, 물들 때만 초록으로 갈라 보이게 한다 */
+.pcard .col.qty{width:84px; text-align:center}
+.dcinp.qtyinp{width:58px}
+.dcinp.qtyinp.set{border-color:var(--ok); background:var(--ok-soft); color:var(--ok)}
 .pcard .col.dcc{width:92px; text-align:center}
-.pcard .col.sal{width:132px}
+.pcard .col.sal{width:140px}
 .pcard .col.sal .c-sale{font-size:20px; font-weight:800; color:var(--price); letter-spacing:-.02em}
+/* 수량을 넣었을 때만 채워지는 단가 줄. 비어 있어도 자리는 지켜 줄이 흔들리지 않는다 */
+.pcard .col.sal .unit{display:block; font-size:11.5px; font-weight:700; color:var(--ink-3);
+                      margin-top:2px; letter-spacing:-.01em; white-space:nowrap}
 
 /* 태블릿 — 값 세 칸이 아래로 내려가 한 줄을 차지한다 */
 @media (max-width:860px){
@@ -304,7 +311,7 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
   .pcard .nums{flex:1 1 100%; justify-content:space-between; gap:10px;
                padding-top:11px; border-top:1px dashed var(--line)}
   .pcard .col.fac,.pcard .col.sal{width:auto}
-  .pcard .col.dcc{width:auto}
+  .pcard .col.dcc,.pcard .col.qty{width:auto}
 }
 /* 휴대폰 — 글씨를 한 단계 줄여 한 손에 들어오게 */
 @media (max-width:430px){
@@ -314,6 +321,8 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
   .pcard .col.fac .c-fac{font-size:15px}
   .pcard .col.sal .c-sale{font-size:18px}
   .pcard .col .lb{font-size:11px}
+  .dcinp{width:58px}
+  .dcinp.qtyinp{width:50px}
 }
 
 /* ============================================================
@@ -332,6 +341,17 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
 .shell > .gsearch .qbtn:active{transform:translateY(-50%) scale(.94)}
 .shell > .gsearch .qbtn:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
 
+/* 맨 아래 작은 줄 — 구글플레이가 개인정보처리방침 링크를 요구한다 */
+.foot{margin-top:26px; padding:18px 20px 0; border-top:1px solid var(--line);
+  text-align:center; font-size:12.5px; color:var(--ink-3)}
+.foot a{color:var(--ink-3); font-weight:600}
+.foot a:hover{color:var(--brand)}
+
+/* 검색창 위 안내 문구 — 화면에도 보이고 네이버·구글이 읽어가는 제목이다 */
+.hero-h{margin:2px 0 0; font-size:17.5px; font-weight:800; letter-spacing:-.045em;
+  color:var(--ink-2); text-align:center; line-height:1.45}
+.hero-h b{color:var(--brand)}
+
 /* 제조사 줄 */
 .brandbar{display:flex; align-items:center; gap:11px; flex-wrap:wrap}
 .bchips{display:flex; align-items:center; gap:7px; flex-wrap:wrap}
@@ -344,6 +364,7 @@ a.logo,.logo .txt{text-decoration:none;color:inherit}
 .bchip:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
 
 @media (max-width:560px){
+  .hero-h{font-size:15px; letter-spacing:-.05em}
   .shell > .gsearch .inp{height:48px; font-size:15px; padding-right:56px}
   .shell > .gsearch .qbtn{width:38px; height:38px}
   .bchip{font-size:12.5px; padding:7px 12px}

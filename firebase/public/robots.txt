@@ -1,0 +1,11 @@
+# 타이어 공장도가격 - G
+# 검색로봇 안내문 — 네이버(Yeti)·구글(Googlebot) 모두 이 파일을 먼저 읽는다.
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://tireprice.web.app/sitemap.xml
+
+# 다음(카카오) 웹마스터도구 소유확인 — 지우면 인증이 풀린다
+#DaumWebMasterTool:dab02060f73220d780c57dca0ea786f8dc06b19e2752cfc23be7762380982bab:KZhfbUJ/ETlidY5iVkFhig==

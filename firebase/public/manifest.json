@@ -1,0 +1,18 @@
+{
+  "name": "타이어 공장도가격",
+  "short_name": "공장도가격",
+  "description": "전 브랜드 타이어 공장도가격을 규격별로 무료 조회. 할인율을 넣으면 할인가가 바로 나옵니다.",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#2e7df6",
+  "categories": ["business", "utilities"],
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

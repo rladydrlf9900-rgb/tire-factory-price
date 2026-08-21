@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수량 칸 시안 — 타이어 공장도가격</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --panel:#ffffff; --panel-2:#fbfcfe;
+    --ink:#10151d; --ink-2:#4a5361; --ink-3:#7b8593;
+    --line:#e2e8f1; --line-2:#eef2f8;
+    --brand:#2e7df6; --brand-ink:#1b5ed4; --brand-soft:#e8f1fe;
+    --brand-line:#bcd6fb;
+    --price:#d9530a; --price-soft:#fff4ec;
+    --ok:#0b8f52; --ok-soft:#e4f5ec;
+    --shadow:0 1px 2px rgba(16,24,35,.06), 0 6px 18px -10px rgba(16,24,35,.22);
+    --kr:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0b1018; --panel:#121821; --panel-2:#161e28;
+      --ink:#e9eef6; --ink-2:#a5b1c1; --ink-3:#7a8695;
+      --line:#232d3a; --line-2:#1a222c;
+      --brand:#6ea8ff; --brand-ink:#a3c4ff; --brand-soft:#12203a; --brand-line:#2b436e;
+      --price:#ff8259; --price-soft:#2d1a14;
+      --ok:#42c98a; --ok-soft:#0f2820;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 6px 18px -10px rgba(0,0,0,.7);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--kr);
+       font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+       padding:24px 20px 80px}
+  .wrap{max-width:1000px; margin:0 auto}
+  h1{font-size:20px; letter-spacing:-.045em; margin:0 0 6px}
+  .sub{color:var(--ink-3); font-size:13px; margin:0 0 28px}
+
+  .sec{margin:0 0 34px}
+  .sec > h2{font-size:16px; letter-spacing:-.04em; margin:0 0 4px;
+            display:flex; align-items:center; gap:8px}
+  .tag{font-size:11.5px; font-weight:800; padding:3px 8px; border-radius:999px;
+       background:var(--brand-soft); color:var(--brand)}
+  .tag.rec{background:var(--ok-soft); color:var(--ok)}
+  .sec > p{margin:0 0 12px; font-size:13px; color:var(--ink-2)}
+
+  .num{font-variant-numeric:tabular-nums}
+  .cards{display:flex; flex-direction:column; gap:9px}
+  .pcard{display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+         background:var(--panel); border:1px solid var(--line); border-radius:13px;
+         padding:14px 16px; box-shadow:var(--shadow);
+         transition:border-color .13s, box-shadow .13s}
+  .pcard:hover{border-color:var(--brand-line)}
+  .pcard.on{border-color:var(--price); background:var(--price-soft)}
+
+  .pcard .pname{flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:6px}
+  .pcard .pname .pline{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .pcard .pname .mo{font-size:15.5px; font-weight:800; letter-spacing:-.02em}
+  .pcard .pname .pr{font-size:13.5px; font-weight:700; color:var(--brand)}
+  .pcard .pname .bot{display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+                     font-size:13px; color:var(--ink-2)}
+  .pcard .pname .bot b{font-size:13.5px; font-weight:800; color:var(--ink)}
+  .pcard .pname .bot i{font-style:normal; color:var(--ink-3); font-size:12.5px}
+  .bb{display:inline-block; font-size:11.5px; font-weight:800; color:#fff; background:var(--brand);
+      border-radius:6px; padding:3px 8px; white-space:nowrap}
+
+  .pcard .nums{display:flex; align-items:center; gap:14px; flex:0 0 auto}
+  .pcard .col{text-align:right}
+  .pcard .col .lb{display:block; font-size:11.5px; color:var(--ink-3); margin-top:3px; font-weight:600}
+  .pcard .col.fac{width:118px}
+  .pcard .col.fac .c-fac{font-size:16.5px; font-weight:800; color:var(--ink-2)}
+  .pcard .col.qty{width:84px; text-align:center}
+  .pcard .col.dcc{width:92px; text-align:center}
+  .pcard .col.sal{width:140px}
+  .pcard .col.sal .c-sale{font-size:20px; font-weight:800; color:var(--price); letter-spacing:-.02em}
+  .pcard .col.sal .unit{display:block; font-size:11.5px; font-weight:700; color:var(--ink-3);
+                        margin-top:2px; letter-spacing:-.01em}
+
+  .cell{position:relative; display:inline-block}
+  .cell .pc{position:absolute; right:8px; top:50%; transform:translateY(-50%);
+            font-size:12px; font-weight:800; color:var(--ink-3); pointer-events:none}
+  .inp2{width:66px; text-align:right; padding:6px 22px 6px 8px; border:1px solid var(--line);
+        border-radius:7px; background:var(--panel); font:inherit; color:inherit;
+        font-weight:800; font-size:14px; font-variant-numeric:tabular-nums}
+  .inp2::-webkit-outer-spin-button,.inp2::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+  .inp2{-moz-appearance:textfield}
+  .inp2:hover{border-color:var(--ink-3)}
+  .inp2:focus{border-color:var(--brand); outline:none; box-shadow:0 0 0 3px var(--brand-soft)}
+  .inp2.set{border-color:var(--brand); background:var(--brand-soft); color:var(--brand)}
+  .qtyinp{width:58px}
+  .qtyinp.set{border-color:var(--ok); background:var(--ok-soft); color:var(--ok)}
+
+  .note{margin:10px 0 0; padding:10px 13px; background:var(--panel-2);
+        border:1px dashed var(--line); border-radius:10px; font-size:12.5px; color:var(--ink-2)}
+  .note b{color:var(--ink)}
+
+  .sum{margin-top:9px; display:flex; align-items:center; justify-content:flex-end; gap:12px;
+       background:var(--panel); border:1px solid var(--line); border-radius:13px;
+       padding:13px 16px; box-shadow:var(--shadow)}
+  .sum .t{font-size:13.5px; font-weight:800; color:var(--ink-2)}
+  .sum .v{font-size:22px; font-weight:800; color:var(--price); letter-spacing:-.03em}
+
+  @media (max-width:860px){
+    .pcard{gap:11px}
+    .pcard .pname{flex:1 1 100%}
+    .pcard .nums{flex:1 1 100%; justify-content:space-between; gap:8px;
+                 padding-top:11px; border-top:1px dashed var(--line)}
+    .pcard .col.fac,.pcard .col.sal,.pcard .col.dcc,.pcard .col.qty{width:auto}
+  }
+  @media (max-width:430px){
+    .pcard{padding:12px 13px}
+    .pcard .col.fac .c-fac{font-size:15px}
+    .pcard .col.sal .c-sale{font-size:18px}
+    .inp2{width:56px; padding:6px 20px 6px 6px}
+    .qtyinp{width:50px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>수량 칸 시안</h1>
+  <p class="sub">공장도가와 DC 사이에 수량 칸을 넣었습니다. 숫자를 직접 쳐보시면 계산이 바로 됩니다. 세 가지 중에 고르시면 실제 사이트에 넣겠습니다.</p>
+
+  <!-- 안 1 -->
+  <div class="sec">
+    <h2>안 1 <span class="tag">수량은 적기만</span></h2>
+    <p>수량 칸은 메모용입니다. 할인가는 <b>타이어 한 개 값</b> 그대로 나옵니다.</p>
+    <div class="cards" id="a1"></div>
+    <div class="note">지금 화면에서 <b>바뀌는 게 없습니다.</b> 수량은 손님이 몇 개인지 적어두는 칸일 뿐입니다. 곱셈은 사장님이 따로 하셔야 합니다.</div>
+  </div>
+
+  <!-- 안 2 -->
+  <div class="sec">
+    <h2>안 2 <span class="tag rec">수량 × 할인가 = 합계 <b>(추천)</b></span></h2>
+    <p>수량을 넣으면 그 줄의 할인가 자리가 <b>합계 금액</b>으로 바뀝니다. 아래 작은 글씨로 <b>단가</b>가 같이 보입니다.</p>
+    <div class="cards" id="a2"></div>
+    <div class="note">4개 넣으면 <b>62,700 → 250,800</b> 처럼 바로 나옵니다. 단가도 밑에 작게 남아 있어 헷갈리지 않습니다.</div>
+  </div>
+
+  <!-- 안 3 -->
+  <div class="sec">
+    <h2>안 3 <span class="tag">합계 줄을 맨 아래 따로</span></h2>
+    <p>줄마다 할인가는 <b>단가</b> 그대로 두고, 화면 맨 아래에 <b>전체 합계</b>가 붙습니다. 견적 낼 때 쓰는 방식입니다.</p>
+    <div class="cards" id="a3"></div>
+    <div class="sum"><span class="t">합계</span><span class="v num" id="a3sum">0 원</span></div>
+    <div class="note">여러 줄을 한꺼번에 계산해서 손님께 총액을 불러줄 때 편합니다. 대신 화면에 줄이 하나 더 붙습니다.</div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var DATA = [
+    { brand:"한국", model:"VENTUS S1 evo3", product:"밴투스 S1 에보3", size:"235/55R19", spec:"105W XL", price:62700 },
+    { brand:"금호", model:"CRUGEN HP71",     product:"크루젠 HP71",     size:"235/55R19", spec:"101H",     price:58300 },
+    { brand:"넥센", model:"ROADIAN GTX",     product:"로디안 GTX",      size:"235/55R19", spec:"105V XL",  price:54900 }
+  ];
+  var won = function (n) { return (n || 0).toLocaleString("ko-KR"); };
+  var sale = function (p, dc) { return Math.round(p * (1 - (dc || 0) / 100)); };
+
+  function nameHtml(r) {
+    return '<div class="pname">' +
+        '<div class="pline">' +
+          '<span class="bb">' + r.brand + '</span>' +
+          '<span class="mo">' + r.model + '</span>' +
+          '<span class="pr">/ ' + r.product + '</span>' +
+        '</div>' +
+        '<div class="bot num"><b>' + r.size + '</b> <i>' + r.spec + '</i></div>' +
+      '</div>';
+  }
+  function qtyCol() {
+    return '<div class="col qty"><span class="cell">' +
+      '<input class="inp2 qtyinp num" type="number" min="0" max="999" placeholder="0" aria-label="수량">' +
+      '<span class="pc">개</span></span>' +
+      '<span class="lb">수량</span></div>';
+  }
+  function dcCol() {
+    return '<div class="col dcc"><span class="cell">' +
+      '<input class="inp2 dcinp num" type="number" min="0" max="95" placeholder="0" aria-label="DC율">' +
+      '<span class="pc">%</span></span>' +
+      '<span class="lb">DC</span></div>';
+  }
+  function facCol(r) {
+    return '<div class="col fac"><span class="c-fac num">' + won(r.price) + '</span>' +
+      '<span class="lb">공장도가 (원)</span></div>';
+  }
+
+  /* ---- 안 1 : 수량은 적기만 ---- */
+  document.getElementById("a1").innerHTML = DATA.map(function (r, i) {
+    return '<div class="pcard" data-i="' + i + '">' + nameHtml(r) +
+      '<div class="nums">' + facCol(r) + qtyCol() + dcCol() +
+        '<div class="col sal"><span class="c-sale num" data-sale>' + won(r.price) + '</span>' +
+        '<span class="lb">할인가 (원)</span></div>' +
+      '</div></div>';
+  }).join("");
+
+  /* ---- 안 2 : 합계가 할인가 자리에 ---- */
+  document.getElementById("a2").innerHTML = DATA.map(function (r, i) {
+    return '<div class="pcard" data-i="' + i + '">' + nameHtml(r) +
+      '<div class="nums">' + facCol(r) + qtyCol() + dcCol() +
+        '<div class="col sal"><span class="c-sale num" data-sale>' + won(r.price) + '</span>' +
+        '<span class="unit" data-unit>&nbsp;</span>' +
+        '<span class="lb" data-lb>할인가 (원)</span></div>' +
+      '</div></div>';
+  }).join("");
+
+  /* ---- 안 3 : 맨 아래 합계 줄 ---- */
+  document.getElementById("a3").innerHTML = DATA.map(function (r, i) {
+    return '<div class="pcard" data-i="' + i + '">' + nameHtml(r) +
+      '<div class="nums">' + facCol(r) + qtyCol() + dcCol() +
+        '<div class="col sal"><span class="c-sale num" data-sale>' + won(r.price) + '</span>' +
+        '<span class="lb">할인가 (원)</span></div>' +
+      '</div></div>';
+  }).join("");
+
+  function readCard(box) {
+    var i = +box.dataset.i, r = DATA[i];
+    var q = box.querySelector(".qtyinp"), d = box.querySelector(".dcinp");
+    var qv = parseInt(q.value, 10); if (isNaN(qv) || qv < 0) qv = 0;
+    var dv = parseInt(d.value, 10); if (isNaN(dv) || dv < 0) dv = 0;
+    if (dv > 95) { dv = 95; d.value = 95; }
+    q.classList.toggle("set", qv > 0);
+    d.classList.toggle("set", dv > 0);
+    box.classList.toggle("on", dv > 0 || qv > 0);
+    return { r: r, qty: qv, dc: dv, unit: sale(r.price, dv) };
+  }
+
+  document.addEventListener("input", function (e) {
+    var box = e.target.closest(".pcard"); if (!box) return;
+    var sec = box.closest(".sec").querySelector(".cards").id;
+    var s = readCard(box);
+
+    if (sec === "a2") {
+      var tot = s.qty > 0 ? s.unit * s.qty : s.unit;
+      box.querySelector("[data-sale]").textContent = won(tot);
+      box.querySelector("[data-unit]").innerHTML = s.qty > 0
+        ? "단가 " + won(s.unit) + " 원" : "&nbsp;";
+      box.querySelector("[data-lb]").textContent = s.qty > 0
+        ? s.qty + "개 합계 (원)" : "할인가 (원)";
+    } else {
+      box.querySelector("[data-sale]").textContent = won(s.unit);
+    }
+
+    if (sec === "a3") {
+      var sum = 0;
+      document.querySelectorAll("#a3 .pcard").forEach(function (b) {
+        var t = readCard(b); sum += t.unit * t.qty;
+      });
+      document.getElementById("a3sum").textContent = won(sum) + " 원";
+    }
+  });
+})();
+</script>
+</body>
+</html>

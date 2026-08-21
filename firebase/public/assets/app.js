@@ -28,11 +28,13 @@
 
   var ALL = [], BRANDS = [], ready = false;
   var S = { q: "", brands: [], page: 1 };
-  var DCMAP = {}, VIEW = [];
+  var DCMAP = {}, QTYMAP = {}, VIEW = [];
   var Q = null;
 
-  function clearDc() { DCMAP = {}; }
+  /* 목록이 바뀌면 손님이 넣어둔 수량·DC 는 같이 지운다 */
+  function clearCalc() { DCMAP = {}; QTYMAP = {}; }
   function dcOf(i) { return DCMAP[i] === undefined ? 0 : DCMAP[i]; }
+  function qtyOf(i) { return QTYMAP[i] === undefined ? 0 : QTYMAP[i]; }
   function salePrice(p, dc) { return Math.round(p * (100 - dc) / 100); }
 
   /* ============================================================
@@ -150,7 +152,7 @@
      그리기
      ============================================================ */
   function rowHtml(r, i) {
-    var dc = dcOf(i);
+    var dc = dcOf(i), qty = qtyOf(i), unit = salePrice(r.price, dc);
     return '<div class="pcard" data-i="' + i + '">' +
       '<div class="pname">' +
         '<div class="pline">' +
@@ -163,11 +165,16 @@
       '<div class="nums">' +
         '<div class="col fac"><span class="c-fac num">' + won(r.price) + "</span>" +
           '<span class="lb">공장도가 (원)</span></div>' +
+        '<div class="col qty"><span class="dccell">' +
+          '<input class="dcinp qtyinp num' + (qty > 0 ? " set" : "") + '" type="number" min="0" max="999" value="' + (qty ? qty : "") + '" aria-label="수량">' +
+          '<span class="pc">개</span></span></div>' +
         '<div class="col dcc"><span class="dccell">' +
           '<input class="dcinp num' + (dc > 0 ? " set" : "") + '" type="number" min="0" max="95" value="' + (dc ? dc : "") + '" aria-label="DC율">' +
           '<span class="pc">%</span></span></div>' +
-        '<div class="col sal"><span class="c-sale num" data-sale>' + won(salePrice(r.price, dc)) + "</span>" +
-          '<span class="lb">할인가 (원)</span></div>' +
+        /* 수량이 있으면 이 자리가 합계로 바뀌고, 단가는 아래 작은 글씨로 남는다 */
+        '<div class="col sal"><span class="c-sale num" data-sale>' + won(qty > 0 ? unit * qty : unit) + "</span>" +
+          '<span class="unit" data-unit>' + (qty > 0 ? "단가 " + won(unit) + " 원" : "&nbsp;") + "</span>" +
+          '<span class="lb" data-lb>' + (qty > 0 ? qty + "개 합계 (원)" : "할인가 (원)") + "</span></div>" +
       "</div>" +
     "</div>";
   }
@@ -219,22 +226,32 @@
   /* ============================================================
      DC율
      ============================================================ */
-  function applyDc(inp) {
+  function applyCalc(inp) {
     var box = inp.closest(".pcard");
     if (!box) return;
     var i = +box.dataset.i, rec = VIEW[i];
+    var 수량칸 = inp.classList.contains("qtyinp");
     var raw = String(inp.value).replace(/[^\d]/g, "");
     var v = raw === "" ? 0 : parseInt(raw, 10);
-    if (v > 95) { v = 95; inp.value = 95; }
-    DCMAP[i] = v;
+    var 끝 = 수량칸 ? 999 : 95;
+    if (v > 끝) { v = 끝; inp.value = 끝; }
+    (수량칸 ? QTYMAP : DCMAP)[i] = v;
     inp.classList.toggle("set", v > 0);
-    box.classList.toggle("on", v > 0);
-    var cell = $("[data-sale]", box);
-    if (cell && rec) cell.textContent = won(salePrice(rec.price, v));
+
+    var dc = dcOf(i), qty = qtyOf(i);
+    box.classList.toggle("on", dc > 0 || qty > 0);
+    if (!rec) return;
+
+    var unit = salePrice(rec.price, dc);
+    var 값 = $("[data-sale]", box), 단가 = $("[data-unit]", box), 이름 = $("[data-lb]", box);
+    if (값) 값.textContent = won(qty > 0 ? unit * qty : unit);
+    if (단가) 단가.innerHTML = qty > 0 ? "단가 " + won(unit) + " 원" : "&nbsp;";
+    if (이름) 이름.textContent = qty > 0 ? qty + "개 합계 (원)" : "할인가 (원)";
   }
+  /* 수량칸도 dcinp 를 같이 달고 있어 이 하나로 둘 다 받는다 */
   $("#rows").addEventListener("input", function (e) {
     var inp = e.target.closest(".dcinp");
-    if (inp) applyDc(inp);
+    if (inp) applyCalc(inp);
   });
 
   /* 제조사 단추 — 누르면 켜지고 다시 누르면 꺼진다 */
@@ -244,13 +261,13 @@
     var v = b.dataset.b, i = S.brands.indexOf(v);
     if (i === -1) S.brands.push(v); else S.brands.splice(i, 1);
     b.classList.toggle("on", S.brands.indexOf(v) !== -1);
-    S.page = 1; clearDc(); render();
+    S.page = 1; clearCalc(); render();
   });
 
   $("#pager").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-p]");
     if (!b || b.disabled) return;
-    S.page = +b.dataset.p; clearDc(); render();
+    S.page = +b.dataset.p; clearCalc(); render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
@@ -260,7 +277,7 @@
   function runSearch() {
     S.q = $("#q").value.trim();
     Q = parseQuery(S.q);
-    S.page = 1; clearDc(); render();
+    S.page = 1; clearCalc(); render();
   }
   $("#q").addEventListener("keydown", function (e) {
     if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
@@ -285,7 +302,7 @@
     S.q = ""; Q = null; S.brands = [];
     $("#q").value = "";
     $$("#brandlist .bchip").forEach(function (b) { b.classList.remove("on"); });
-    S.page = 1; clearDc(); render();
+    S.page = 1; clearCalc(); render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   function 시계다시() {
