@@ -27,23 +27,9 @@
       "site": "tireprice-g",
       "public": "public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "headers": [
-        {
-          "source": "**/*.html",
-          "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
-        },
-        {
-          "source": "/assets/**",
-          "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000" }]
-        },
-        {
-          "source": "/@(sw.js|manifest.json)",
-          "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
-        },
-        {
-          "source": "/.well-known/assetlinks.json",
-          "headers": [{ "key": "Content-Type", "value": "application/json" }]
-        }
+      "redirects": [
+        { "source": "/", "destination": "https://tireprice.web.app/", "type": 301 },
+        { "source": "/:rest*", "destination": "https://tireprice.web.app/:rest*", "type": 301 }
       ]
     }
   ],
