@@ -4,6 +4,7 @@
       "site": "tireprice",
       "public": "public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "trailingSlash": false,
       "headers": [
         {
           "source": "**/*.html",

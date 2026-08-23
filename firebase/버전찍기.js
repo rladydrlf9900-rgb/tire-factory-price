@@ -14,7 +14,21 @@ const fs = require("fs");
 const path = require("path");
 
 const 공개 = path.join(__dirname, "public");
-const 대상 = ["index.html", "admin.html"];
+
+/* public 안의 html 을 전부 찾는다 (assets 는 뺀다).
+   규격페이지.js 가 만드는 436장(245-45-18/index.html …)도 여기 들어와야 한다 —
+   빠지면 그 페이지들만 옛 css 를 물고 있게 된다 */
+function html전부(dir, 앞 = "") {
+  const 나온것 = [];
+  for (const 이름 of fs.readdirSync(dir)) {
+    if (이름 === "assets" || 이름.startsWith(".")) continue;
+    const 길 = path.join(dir, 이름);
+    if (fs.statSync(길).isDirectory()) 나온것.push(...html전부(길, 앞 + 이름 + "/"));
+    else if (이름.endsWith(".html")) 나온것.push(앞 + 이름);
+  }
+  return 나온것;
+}
+const 대상 = html전부(공개);
 
 function 번호표(자산길) {
   const 파일 = path.join(공개, 자산길.replace(/^\//, ""));
@@ -31,7 +45,10 @@ for (const 이름 of 대상) {
   const 후 = 전.replace(/(["'])(\/assets\/[^"'?]+\.(?:css|js))(?:\?[^"']*)?\1/g,
     (_, q, 자산) => q + 자산 + "?v=" + 번호표(자산) + q);
 
-  if (후 !== 전) { fs.writeFileSync(길, 후); 바뀐수++; }
-  console.log((후 !== 전 ? "찍음  " : "그대로 ") + 이름);
+  if (후 !== 전) {
+    fs.writeFileSync(길, 후); 바뀐수++;
+    if (바뀐수 <= 10) console.log("찍음  " + 이름);
+    else if (바뀐수 === 11) console.log("찍음  … (나머지는 줄여서 안 적는다)");
+  }
 }
-console.log(바뀐수 + "개 파일에 번호표를 새로 찍었습니다.");
+console.log("html " + 대상.length + "장 중 " + 바뀐수 + "장에 번호표를 새로 찍었습니다.");
