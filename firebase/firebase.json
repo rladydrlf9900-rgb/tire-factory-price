@@ -2,46 +2,7 @@
   "hosting": [
     {
       "site": "tireprice",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "trailingSlash": false,
-      "headers": [
-        {
-          "source": "**",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-cache, must-revalidate"
-            }
-          ]
-        },
-        {
-          "source": "/assets/**",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "public, max-age=31536000, immutable"
-            }
-          ]
-        },
-        {
-          "source": "/.well-known/assetlinks.json",
-          "headers": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "site": "tireprice-g",
-      "public": "public",
+      "public": "옮김",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -50,12 +11,33 @@
       "redirects": [
         {
           "source": "/",
-          "destination": "https://tireprice.web.app/",
+          "destination": "https://tireprice.gilpos.kr/",
           "type": 301
         },
         {
           "source": "/:rest*",
-          "destination": "https://tireprice.web.app/:rest*",
+          "destination": "https://tireprice.gilpos.kr/:rest*",
+          "type": 301
+        }
+      ]
+    },
+    {
+      "site": "tireprice-g",
+      "public": "옮김",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "redirects": [
+        {
+          "source": "/",
+          "destination": "https://tireprice.gilpos.kr/",
+          "type": 301
+        },
+        {
+          "source": "/:rest*",
+          "destination": "https://tireprice.gilpos.kr/:rest*",
           "type": 301
         }
       ]
