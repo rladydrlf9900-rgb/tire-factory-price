@@ -10,6 +10,16 @@
       ],
       "redirects": [
         {
+          "regex": "^/sizes(?:/.*)?$",
+          "destination": "https://tireprice.gilpos.kr/",
+          "type": 301
+        },
+        {
+          "regex": "^/(?P<size>[0-9]{3}-[0-9]{2}(?:-[0-9]{2})?|[0-9]{2}X[0-9]{1,2}\\.[0-9]{2}-[0-9]{2})/?$",
+          "destination": "https://tireprice.gilpos.kr/?q=:size",
+          "type": 301
+        },
+        {
           "source": "/",
           "destination": "https://tireprice.gilpos.kr/",
           "type": 301
@@ -30,6 +40,16 @@
         "**/node_modules/**"
       ],
       "redirects": [
+        {
+          "regex": "^/sizes(?:/.*)?$",
+          "destination": "https://tireprice.gilpos.kr/",
+          "type": 301
+        },
+        {
+          "regex": "^/(?P<size>[0-9]{3}-[0-9]{2}(?:-[0-9]{2})?|[0-9]{2}X[0-9]{1,2}\\.[0-9]{2}-[0-9]{2})/?$",
+          "destination": "https://tireprice.gilpos.kr/?q=:size",
+          "type": 301
+        },
         {
           "source": "/",
           "destination": "https://tireprice.gilpos.kr/",
